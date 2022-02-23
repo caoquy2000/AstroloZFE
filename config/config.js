@@ -28,10 +28,8 @@ export default defineConfig({
     loading: '@/components/Loading',
   },
   define: {
-    API_BATCH_URL:
-      'http://20.124.25.10',
-    API_URL:
-      'http://20.124.25.10',
+    API_BATCH_URL: 'http://20.124.25.10',
+    API_URL: 'http://20.124.25.10',
   },
   targets: {
     ie: 11,
@@ -70,7 +68,7 @@ export default defineConfig({
       name: 'dashboard',
       icon: 'dashboard',
       access: 'canAdmin',
-      component: './Dashboard',
+      component: './dashboard',
     },
     {
       path: '/admin',
@@ -111,7 +109,7 @@ export default defineConfig({
           name: 'Users',
           // icon: 'user',
           access: 'canAdmin',
-          component: './shop/users'
+          component: './shop/users',
         },
         {
           component: './404',
@@ -133,8 +131,8 @@ export default defineConfig({
         },
         {
           component: './404',
-        }
-      ]
+        },
+      ],
     },
     {
       name: 'list.table-list',

@@ -8,17 +8,23 @@ import {
 } from '@ant-design/icons';
 import { Alert, message, Tabs, Button } from 'antd';
 import React, { useState } from 'react';
-import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm, Form, FormItem } from '@ant-design/pro-form';
+import {
+  ProFormCaptcha,
+  ProFormCheckbox,
+  ProFormText,
+  LoginForm,
+  Form,
+  FormItem,
+} from '@ant-design/pro-form';
 import { useIntl, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
-import {ConfigProvider} from '@ant-design/pro-provider';
+import { ConfigProvider } from '@ant-design/pro-provider';
 import styles from './index.less';
 import token from '@/utils/token';
 
 let access = ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site' ? 'admin' : '';
-
 
 const LoginMessage = ({ content }) => (
   <Alert
@@ -52,25 +58,23 @@ const Login = () => {
       const msg = await login({ ...values, type });
 
       if (true) {
-        access = msg.currentAuthority;
+        access = 'admin';
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: 'Login successful!',
         });
-        token.save();
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
         setButtonLoading(false);
-      
 
         if (!history) return;
         const { query } = history.location;
         const { redirect } = query;
         history.push(redirect || '/');
         return;
-      } 
+      }
       setButtonLoading(false);
-      console.log(msg); 
+      console.log(msg);
 
       setUserLoginState(msg);
     } catch (error) {
@@ -89,11 +93,10 @@ const Login = () => {
         {SelectLang && <SelectLang />}
       </div>
       <div className={styles.content}>
-      
         <LoginForm
           title="AstroloZ Admin"
           style={{
-            width: '100%'
+            width: '100%',
           }}
           // initialValues={{
           //   autoLogin: true,
@@ -101,18 +104,12 @@ const Login = () => {
           submitter={{
             render: (props, doms) => {
               return [
-                <Button
-                  type='primary'
-                  block='true'
-                  htmlType='submit'
-                  loading={buttonLoading}
-                >
+                <Button type="primary" block="true" htmlType="submit" loading={buttonLoading}>
                   Login
-                </Button>
-              ]
-            }
+                </Button>,
+              ];
+            },
           }}
-          
           onFinish={async (values) => {
             await handleSubmit(values);
           }}
@@ -122,74 +119,60 @@ const Login = () => {
               key="account"
               tab={intl.formatMessage({
                 id: 'pages.login.accountLogin.tab',
-               
               })}
             />
           </Tabs>
 
-            {status === 'error' && loginType === 'account' && (
-              <LoginMessage
-                content={
-                  intl.formatMessage({
-                    id: 'pages.login.accountLogin.errorMessage',
-                  })
-                }
-              />
-            )
-            }
-            <>
-              <ProFormText
-                name="username"
-                className={styles.form_field}
-                fieldProps={{
-                  size: 'large',
-                  prefix: <UserOutlined className={styles.prefixIcon} />,
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.username.placeholder',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.username.required"
-                      />
-                    ),
-                  },
-                ]}
-               
-              />
-              <ProFormText.Password
-                name="password"
-                className={styles.form_field}
-                fieldProps={{
-                  size: 'large',
-                  prefix: <LockOutlined className={styles.prefixIcon} />,
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.password.placeholder',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.password.required"
-                      />
-                    ),
-                  },
-                ]}
-              
-              />
-            </>
+          {status === 'error' && loginType === 'account' && (
+            <LoginMessage
+              content={intl.formatMessage({
+                id: 'pages.login.accountLogin.errorMessage',
+              })}
+            />
+          )}
+          <>
+            <ProFormText
+              name="username"
+              className={styles.form_field}
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined className={styles.prefixIcon} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.username.placeholder',
+              })}
+              rules={[
+                {
+                  required: true,
+                  message: <FormattedMessage id="pages.login.username.required" />,
+                },
+              ]}
+            />
+            <ProFormText.Password
+              name="password"
+              className={styles.form_field}
+              fieldProps={{
+                size: 'large',
+                prefix: <LockOutlined className={styles.prefixIcon} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.password.placeholder',
+              })}
+              rules={[
+                {
+                  required: true,
+                  message: <FormattedMessage id="pages.login.password.required" />,
+                },
+              ]}
+            />
+          </>
           <div
             style={{
               marginBottom: 24,
             }}
           >
             <ProFormCheckbox noStyle name="autoLogin">
-              <FormattedMessage id="pages.login.rememberMe"  />
+              <FormattedMessage id="pages.login.rememberMe" />
             </ProFormCheckbox>
             <a
               style={{
@@ -199,9 +182,7 @@ const Login = () => {
               <FormattedMessage id="pages.login.forgotPassword" />
             </a>
           </div>
-      
         </LoginForm>
-    
       </div>
       <Footer />
     </div>
