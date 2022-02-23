@@ -70,14 +70,14 @@ export default defineConfig({
       name: 'dashboard',
       icon: 'dashboard',
       access: 'canAdmin',
-      component: './Dashboard',
+      component: './dashboard',
     },
     {
       path: '/admin',
       name: 'admin',
       icon: 'crown',
       access: 'canAdmin',
-      component: './Admin',
+      component: './admin',
       routes: [
         {
           path: '/admin/sub-page',
