@@ -77,7 +77,7 @@ export default defineConfig({
       name: 'admin',
       icon: 'crown',
       access: 'canAdmin',
-      component: './admin',
+      component: './Admin',
       routes: [
         {
           path: '/admin/sub-page',
