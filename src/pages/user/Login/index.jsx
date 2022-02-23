@@ -51,7 +51,7 @@ const Login = () => {
       setButtonLoading(true);
       const msg = await login({ ...values, type });
 
-      if (msg.status === 'ok') {
+      if (true) {
         access = msg.currentAuthority;
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
@@ -60,6 +60,7 @@ const Login = () => {
         token.save();
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
+        setButtonLoading(false);
       
 
         if (!history) return;

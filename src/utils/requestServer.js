@@ -25,7 +25,7 @@ const request = extend({
         
         // Referer: 'strict-origin-when-cross-origin',
     },
-    errorHandler
+    errorHandler,
 });
 
 request.interceptors.response.use((response, option) => {

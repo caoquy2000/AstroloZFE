@@ -29,13 +29,9 @@ export default defineConfig({
   },
   define: {
     API_BATCH_URL:
-      REACT_APP_ENV == 'dev'
-        ? 'http://20.124.25.10'
-        : 'http://20.124.25.10',
+      'http://20.124.25.10',
     API_URL:
-      REACT_APP_ENV == 'dev'
-        ? 'http://20.124.25.10'
-        : 'http://20.124.25.10',
+      'http://20.124.25.10',
   },
   targets: {
     ie: 11,

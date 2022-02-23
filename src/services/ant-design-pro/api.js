@@ -9,7 +9,6 @@ export async function currentUser(options) {
   return request('/api/currentUser', {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: token.get(),
     },
     method: 'GET',
     ...(options || {}),
