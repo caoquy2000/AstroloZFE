@@ -7,6 +7,8 @@ import Footer from '@/components/Footer';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
+
+import { setLocale, getLocale } from 'umi';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 /** 获取用户信息比较慢的时候会展示一个 loading */
@@ -14,9 +16,6 @@ const loginPath = '/user/login';
 export const initialStateConfig = {
   loading: false,
 };
-/**
- * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
- * */
 
 export async function getInitialState() {
   const fetchUserInfo = async () => {
@@ -58,7 +57,7 @@ export async function getInitialState() {
         ],
         notifyCount: 12,
         unreadCount: 11,
-        country: 'China',
+        country: 'US',
         access: getAccess(),
         geographic: {
           province: {
@@ -96,6 +95,8 @@ export async function getInitialState() {
 } // ProLayout 支持的api https://procomponents.ant.design/components/layout
 
 export const layout = ({ initialState, setInitialState }) => {
+  // Mac dinh phai set ngon ngu trong app vi config bi loi
+  setLocale('en-US');
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
