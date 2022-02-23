@@ -7,43 +7,43 @@ import { PlusOutlined } from '@ant-design/icons';
 import ModalForm from '@/components/ModalForm';
 import { getUsers } from '@/services/ant-design-pro/user';
 
-// const data = [
-//     {
-//         id: 1,
-//         number: 1,
-//         username: 'Cao Hoàng Quy',
-//         phonenumber: '0914682425',
-//         status: 1,
-//     },
-//     {
-//         id: 2,
-//         number: 2,
-//         username: 'Nguyễn Văn Hiếu',
-//         phonenumber: '0914682426',
-//         status: 1,
-//     },
-//     {
-//         id: 3,
-//         number: 3,
-//         username: 'Cao Hoàng Phát Lộc',
-//         phonenumber: '0914682427',
-//         status: 1,
-//     },
-//     {
-//         id: 4,
-//         number: 4,
-//         username: 'Trần Văn A',
-//         phonenumber: '0914682425',
-//         status: 0,
-//     },
-//      {
-//         id: 5,
-//         number: 5,
-//         username: 'Phạm Thanh Tùng',
-//         phonenumber: '0914682427',
-//         status: 0,
-//     },
-// ]
+const data = [
+  {
+    id: 1,
+    number: 1,
+    userName: 'Cao Hoàng Quy',
+    phoneNumber: '0914682425',
+    status: 1,
+  },
+  {
+    id: 2,
+    number: 2,
+    userName: 'Nguyễn Văn Hiếu',
+    phoneNumber: '0914682426',
+    status: 1,
+  },
+  {
+    id: 3,
+    number: 3,
+    userName: 'Cao Hoàng Phát Lộc',
+    phoneNumber: '0914682427',
+    status: 1,
+  },
+  {
+    id: 4,
+    number: 4,
+    userName: 'Trần Văn A',
+    phoneNumber: '0914682425',
+    status: 0,
+  },
+  {
+    id: 5,
+    number: 5,
+    userName: 'Phạm Thanh Tùng',
+    phoneNumber: '0914682427',
+    status: 0,
+  },
+];
 
 const User = () => {
   //config column
@@ -225,17 +225,17 @@ const User = () => {
         <ProTable
           columns={column}
           request={async (params, sort, filter) => {
-            const data = [];
+            // const data = [];
             // console.log('A');
-            await getUsers().then((res) => {
-              console.log('res', res);
-              res?.map((item, index) => {
-                item.number = index + 1;
-                data[index] = item;
-              });
-            });
+            // await getUsers().then((res) => {
+            //   console.log('res', res);
+            //   res?.map((item, index) => {
+            //     item.number = index + 1;
+            //     data[index] = item;
+            //   });
+            // });
 
-            console.log('data', data);
+            // console.log('data', data);
             return {
               data: data,
               success: true,
