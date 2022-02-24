@@ -2,7 +2,8 @@ import React from 'react';
 
 import { Button, Modal } from 'antd';
 import ProForm, { ProFormSelect, ProFormText } from '@ant-design/pro-form';
-
+import ProSkeleton from '@ant-design/pro-skeleton';
+import styles from './index.less';
 
 
 const ModalForm = (props) => {
@@ -13,9 +14,10 @@ const ModalForm = (props) => {
         formRef,
         buttonSubmitter,
         handleSubmitForm,
-        formField
+        formField,
     } = props;
-  
+    
+
     const handleCancelModelChild = (valuses) => {
         if (handleCancelModel) {
             handleCancelModel();
@@ -37,7 +39,7 @@ const ModalForm = (props) => {
             value.form?.submit();
         }
     };
-
+  
     return (
         <>
             <Modal
@@ -54,81 +56,109 @@ const ModalForm = (props) => {
                         Cancel
                     </Button>
                 ]}
-            >
-                <ProForm
-                    onReset={true}
-                    formRef={formRef}
-                    submitter={{
-                        render: (props, doms) => {
-                            return [
-                                <>
-                                    {
-                                        buttonSubmitter.map((button) => (
-                                            <Button
-                                                key={button?.key}
-                                                type={button?.type}
-                                                onClick={button?.click === 'submit' ? () => handleButtonSubmitForm(props) : () => handleButtonResetForm(props)}
-                                                loading={button?.loading}
-                                            >
-                                                {button?.name}
-                                            </Button>
-                                        ))
-                                    }
-                                </>
-                            ]
-                        }
-                    }}
-                    onFinish={async (values) => await handleSubmitFormChild(values)}
-                >
-                    {
-                        formField.map((item) => (
-                            <> 
-                                {
-                                    item?.fieldType === 'formText' && (
-                                        <ProForm.Group>
-                                            <ProFormText
-                                                key={item?.key}
-                                                label={item?.label}
-                                                width={item?.width}
-                                                placeholder={item?.placeholder}
-                                                name={item?.name}
-                                                rules={[{
-                                                    required: item?.requiredField,
-                                                    message: item?.ruleMessage,
-                                                }]}
-                                            />
-                                        </ProForm.Group>
-                                    )
-                                }
-                                {
-                                    item?.fieldType === 'formSelect' && (
-                                        <ProForm.Group>
-                                            <ProFormSelect
-                                                name={item?.name}
-                                                label={item?.label}
-                                                options={item?.valueEnum?.map((valueItem) => ({
-                                                    label: valueItem.valueDisplay,
-                            
-                                                    value: valueItem.valueName, 
-                                                }))}
-                                                placeholder={item?.placeholder}
-                                                rules={[{
-                                                    required: item?.requiredField,
-                                                    message: item?.ruleMessage,
-                                                }]}
-                                            />
-                                        </ProForm.Group>
-                                    )
-                                }
-                                
-                                
-                            </>
-                        ))
-                    }
-                </ProForm>
+            >   
+                {
+              
+                    <ProForm
+                        // form={form}
+                        onReset={true}
+                        formRef={formRef}
+                        submitter={{
+                            render: (props, doms) => {
+                                return [
+                                    <>
+                                        {
+                                            buttonSubmitter.map((button) => (
+                                                <Button
+                                                    key={button?.key}
+                                                    type={button?.type}
+                                                    onClick={button?.click === 'submit' ? () => handleButtonSubmitForm(props) : () => handleButtonResetForm(props)}
+                                                    loading={button?.loading}
+                                                >
+                                                    {button?.name}
+                                                </Button>
+                                            ))
+                                        }
+                                    </>
+                                ]
+                            }
+                        }}
+                        onFinish={async (values) => await handleSubmitFormChild(values)}
+                      >
+                          {
+                              formField.map((item) => (
+                                  
+                                  <> 
+                                      {
+                                          item?.fieldType === 'formText' && (
+                                              <ProForm.Group>
+                                                  <ProFormText
+                                                    //   key={item?.key}
+                                                      label={item?.label}
+                                                      width={item?.width}
+                                                      placeholder={item?.placeholder}
+                                                      name={item?.name}
+                                                    //   value={item?.value}
+                                                    //   initialValue={item?.value}
+                                                      rules={[{
+                                                          required:  item?.requiredField,
+                                                          message: item?.ruleMessage,
+                                                      }]}
+  
+                                                  />
+                                              
+                                                  
+                                              </ProForm.Group>
+                                              
+                                          )
+                                      }
+                                      {
+                                          item?.fieldType === 'formSelect' && (
+                                              <ProForm.Group>
+                                                  <ProFormSelect
+                                                      name={item?.name}
+                                                      label={item?.label}
+                                                      options={item?.valueEnum?.map((valueItem) => ({
+                                                          label: valueItem.valueDisplay,
+                                  
+                                                          value: valueItem.valueName, 
+                                                      }))}
+                                                      placeholder={item?.placeholder}
+                                                      rules={[{
+                                                          required: item?.requiredField,
+                                                          message: item?.ruleMessage,
+                                                      }]}
+                                                  />
+                                              </ProForm.Group>
+                                          )
+                                      }
+                                      {
+                                          item?.fieldType === 'checkEdit' && (
+                                              <ProForm.Group
+                                                  style={{
+                                                      display: 'none',
+                                                  }}
+                                              >
+                                                  <ProFormText
+                                                      name={item?.name}
+                                                      initialValue={item?.value}
+                                                      
+                                                  />
+                                              </ProForm.Group>
+                                          )
+                                      }
+                                      
+                                      
+                                  </>
+                              ))
+                          }
+                    </ProForm>
+                  
+                }
+              
             </Modal>
         </>
     );
 };
 
-export default ModalForm;
+export default React.memo(ModalForm);

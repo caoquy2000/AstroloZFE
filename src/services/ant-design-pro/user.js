@@ -1,11 +1,10 @@
 import request from '@/utils/requestServer';
 
 export const getUsers = async () => {
-  console.log('D');
   return await request
     .get('/api/User')
     .then((response) => {
-      console.log('response', response);
+      console.log('response getUsers', response);
       if (response && response.length > 0) {
         return response;
       }
@@ -14,3 +13,9 @@ export const getUsers = async () => {
       console.log('errorGetUsers', error);
     });
 };
+
+export const addUser =  (body) => {
+  return request
+    .post('/api/User', {data: body});
+    
+}
