@@ -7,6 +7,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import ModalForm from '@/components/ModalForm';
 import { getUsers } from '@/services/ant-design-pro/user';
 import { addUser } from '@/services/ant-design-pro/user';
+import { editUser } from '@/services/ant-design-pro/user';
 // const data = [
 //   {
 //     id: 1,
@@ -210,7 +211,7 @@ const User = () => {
     {
       fieldType: 'formSelect',
       key: 'selectStatusUser',
-      name: 'selectStatus',
+      name: 'status',
       label: 'Status',
       defaultValue: 1,
       valueEnum: [
@@ -294,16 +295,22 @@ const User = () => {
     setButtonLoading(true);
     if (values.edit) {
       // sử lí edit user
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          console.log(values);
-          resolve(true);
-        }, 2000);
-      });
-    } 
-    // sử lí add user bình thường
-    await addUser(values);
-
+      const newValues = Object.assign({}, values);
+      const attr = 'edit';
+      const dataEdit = Object.keys(newValues).reduce((item, key) => {
+        if (key !== attr) {
+          item[key] = newValues[key];
+        }
+        return item;
+      }, {});
+      dataEdit.id = userRecord.id;
+      console.log(dataEdit);
+      // await editUser(userRecord.id, dataEdit);
+    } else {
+      // sử lí add user bình thường
+      await addUser(values);
+    }
+    
     actionRef?.current?.reload();
     setButtonLoading(false);
   };
@@ -318,9 +325,31 @@ const User = () => {
       <PageContainer>
         <ProTable
           columns={column}
-          request={async (params, sort, filter) => {
+          request={async (params, sort, filter) => { 
+            const currentAttr = 'current';
+            const pageSizeAttr = 'pageSize';
+            const newParams = Object.keys(params).reduce((item, key) => {
+              if (key != currentAttr && key != pageSizeAttr) {
+                if (key === 'userName') {
+                  item.name = params[key];
+                } else if (key === 'phoneNumber') {
+                  item.phone = params[key]; 
+                } else if (key === 'status') {
+                  if (params[key].toString().toLowerCase() === 'active') {
+                    item.status = 1;
+                  } else if (params[key].toString().toLowerCase() === 'unactive') {
+                    item.status = 0;
+                  }
+                } else {
+                  item[key] = params[key];
+                }
+              }
+              return item;
+            }, {});
+            console.log('params',newParams);
             const data = [];
-            await getUsers().then((res) => {
+            await getUsers(newParams).then((res) => {
+              console.log('res at table query', res);
               res?.map((item, index) => {
                 item.number = index + 1;
                 data[index] = item;

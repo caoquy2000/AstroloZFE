@@ -22,13 +22,14 @@ const codeMessage = {
 const errorHandler = (error) => {
   console.log('errorAtRequestServer', error.data);
   const { response } = error;
-  console.log('responseAtRequestServer', response);
+  // console.log('responseAtRequestServer', response);
+  console.log(response.body);
   if (response && response.status) {
-    console.log('response.body.message', response.body?.message);
-    console.log('err.errors', error?.data?.errors);
-    const errorText = error?.data?.errors
-      ? error?.data?.errors ?? (codeMessage[response.status] || response.statusText)
-      : error?.data?.title;
+    // console.log('response.body.message', response.body?.message);
+    // console.log('err.errors', error?.data?.errors);
+    // const errorText = error?.data?.errors
+    //   ? error?.data?.errors ?? (codeMessage[response.status] || response.statusText)
+    //   : error?.data?.title;
     const {status, url, ...params} = response;
     if (status == 404) {
       notification.info({
@@ -37,7 +38,7 @@ const errorHandler = (error) => {
     } else {
       notification.error({
         message: `Request Error ${status}: ${url}`,
-        description: errorText,
+        // description: errorText,
       });
     }
   } else if (!response) {

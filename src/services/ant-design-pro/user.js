@@ -1,8 +1,10 @@
 import request from '@/utils/requestServer';
 
-export const getUsers = async () => {
+export const getUsers = async (params) => {
   return await request
-    .get('/api/User')
+    .get('/api/User', {
+      params: params,
+    })
     .then((response) => {
       console.log('response getUsers', response);
       if (response && response.length > 0) {
@@ -19,3 +21,15 @@ export const addUser =  (body) => {
     .post('/api/User', {data: body});
     
 }
+
+export const editUser = (userId, body) => {
+  return request
+    .put(`/api/User/${userId}`, {data: body});
+}
+
+// export const searchUser = (params) => {
+//   return request
+//     .get('/api/User', {
+//       params: params,
+//     })
+// }
