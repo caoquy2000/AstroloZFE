@@ -305,7 +305,7 @@ const User = () => {
       }, {});
       dataEdit.id = userRecord.id;
       console.log(dataEdit);
-      // await editUser(userRecord.id, dataEdit);
+      await editUser(userRecord.id, dataEdit);
     } else {
       // sử lí add user bình thường
       await addUser(values);

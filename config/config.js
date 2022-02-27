@@ -118,17 +118,20 @@ export default defineConfig({
       ],
     },
     {
-      path: '/zodiac',
-      name: 'Zodiac',
+      path: '/astrology',
+      name: 'Astrology',
       icon: 'snippets',
-      access: 'canAdmin',
-      component: './zodiac',
+      // access: 'canAdmin',
       routes: [
         {
-          path: '/zodiac/sub-page',
-          name: 'sub-page',
-          icon: 'smile',
-          component: './Welcome',
+          path: '/astrology',
+          redirect: '/astrology/zodiac',
+        },
+        {
+          path: '/astrology/zodiac',
+          name: 'Zodiac',
+          // icon: 'smile',
+          component: './astrology/zodiac',
         },
         {
           component: './404',

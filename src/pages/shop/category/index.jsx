@@ -132,7 +132,7 @@ const Category = () => {
             </div>
             <div className={styles.width_table_action}>
               <Button
-                key="editCategory"
+                key="deleteCategory"
                 type="danger"
                 size="middle"
                 icon={<DeleteOutlined />}
