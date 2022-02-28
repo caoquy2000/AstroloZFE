@@ -115,7 +115,54 @@ const Zodiac = () => {
         },
     ];
 
-    const formFieldAdd = []; 
+    const formFieldAdd = [
+        {
+            fieldType: 'formText',
+            key: 'fieldAddZodiacName',
+            label: 'Zodiac Name',
+            width: 'lg',
+            placeholder: 'Enter Zodiac Name',
+            name: 'zodiacName',
+            requireField: 'true',
+            ruleMessage: 'Input Zodiac Name before submit',
+        },
+        {
+            fieldType: 'formCalendar',
+            name: 'zodiacTimeStart',
+        },
+        {
+            fieldType: 'formCalendar',
+            name: 'zodiacTimeEnd',
+        },
+        {
+            fieldType: 'formInputFileImg',
+            name: 'zodiacFile',
+        },
+        {
+            fieldType: 'formText',
+            key: 'fieldGetImgLink',
+            label: 'Zodiac Icon',
+            width: 'lg',
+            placeholder: 'Icon Link',
+            name: 'zodiacIcon',
+            readOnly: 'true',
+            requireField: 'true',
+            ruleMessage: 'Select image before submit',
+        },
+        {
+            fieldType: 'formTextArea',
+            key: 'fieldAddZodiacDescription',
+            label: 'Description',
+            width: 'lg',
+            placeholder: 'Enter Zodiac description',
+            name: 'zodiacDescription',
+            requiredField: 'true',
+            ruleMessage: 'Input description before submit',
+        },
+        {
+            fieldType: 'zodiacEditorMainContent',
+        }
+    ]; 
 
     const formFieldEdit = [];
 

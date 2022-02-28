@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button, Modal } from 'antd';
-import ProForm, { ProFormSelect, ProFormText } from '@ant-design/pro-form';
+import ProForm, { ProFormDatePicker, ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import ProSkeleton from '@ant-design/pro-skeleton';
 import styles from './index.less';
 
@@ -93,13 +93,11 @@ const ModalForm = (props) => {
                                           item?.fieldType === 'formText' && (
                                               <ProForm.Group>
                                                   <ProFormText
-                                                    //   key={item?.key}
+                                                      key={item?.key}
                                                       label={item?.label}
                                                       width={item?.width}
                                                       placeholder={item?.placeholder}
                                                       name={item?.name}
-                                                    //   value={item?.value}
-                                                    //   initialValue={item?.value}
                                                       rules={[{
                                                           required:  item?.requiredField,
                                                           message: item?.ruleMessage,
@@ -130,6 +128,13 @@ const ModalForm = (props) => {
                                                       }]}
                                                   />
                                               </ProForm.Group>
+                                          )
+                                      }
+                                      {
+                                          item?.fieldType === 'formCalendar' && (
+                                              <ProFormDatePicker
+                                                name={item?.zodiacTimeStart}
+                                              />
                                           )
                                       }
                                       {

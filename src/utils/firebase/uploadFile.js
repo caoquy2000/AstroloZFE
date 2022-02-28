@@ -2,12 +2,13 @@ import firebase from "./firebase";
 import { storage } from "./firebase";
 
 export const  uploadFile = (file) => {
+    console.log(file);
     let imgLink;
     let metaData = {
         contentType: 'image/jpeg',
     };
 
-    let uploadTask = storage.ref('img/' + Date.now()).put(file, metaData);
+    let uploadTask = storage.ref(`images/${file.name}`).put(file, metaData);
     uploadTask.on(
         firebase.storage.TaskEvent.STATE_CHANGED,
         function(snapshot) {
