@@ -231,7 +231,7 @@ const User = () => {
     {
       fieldType: 'checkEdit',
       name: 'edit',
-      value: 'edit'
+      value: 'edit',
     },
   ];
 
@@ -256,9 +256,8 @@ const User = () => {
   }, [buttonLoading]);
 
   React.useEffect(() => {
-
     if (userRecord) {
-      const newFormFieldEditUser = formFieldEditUser.map((item,index) => {
+      const newFormFieldEditUser = formFieldEditUser.map((item, index) => {
         if (item.name === 'userName') {
           item.value = userRecord.userName;
         } else if (item?.name === 'phoneNumber') {
@@ -267,11 +266,11 @@ const User = () => {
         return item;
       });
       setFormFieldEditUser(newFormFieldEditUser);
-      //Vì modal form khi hủy modal giá trị initial value vẫn ko đổi nên ta 
+      //Vì modal form khi hủy modal giá trị initial value vẫn ko đổi nên ta
       //phải dùng setFieldvalue để set value cho các field
       formUserRef?.current?.setFieldsValue(userRecord);
-    } 
-  },[userRecord]);
+    }
+  }, [userRecord]);
 
   const handleModal = () => {
     setShowModel(!showModal);
@@ -310,7 +309,7 @@ const User = () => {
       // sử lí add user bình thường
       await addUser(values);
     }
-    
+
     actionRef?.current?.reload();
     setButtonLoading(false);
   };
@@ -325,7 +324,7 @@ const User = () => {
       <PageContainer>
         <ProTable
           columns={column}
-          request={async (params, sort, filter) => { 
+          request={async (params, sort, filter) => {
             const currentAttr = 'current';
             const pageSizeAttr = 'pageSize';
             const newParams = Object.keys(params).reduce((item, key) => {
@@ -333,7 +332,7 @@ const User = () => {
                 if (key === 'userName') {
                   item.name = params[key];
                 } else if (key === 'phoneNumber') {
-                  item.phone = params[key]; 
+                  item.phone = params[key];
                 } else if (key === 'status') {
                   if (params[key].toString().toLowerCase() === 'active') {
                     item.status = 1;
@@ -346,7 +345,7 @@ const User = () => {
               }
               return item;
             }, {});
-            console.log('params',newParams);
+            console.log('params', newParams);
             const data = [];
             await getUsers(newParams).then((res) => {
               console.log('res at table query', res);

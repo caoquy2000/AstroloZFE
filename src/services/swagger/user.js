@@ -77,4 +77,3 @@ export async function deleteUser(params, options) {
     ...(options || {}),
   });
 }
-

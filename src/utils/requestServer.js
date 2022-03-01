@@ -30,7 +30,7 @@ const errorHandler = (error) => {
     // const errorText = error?.data?.errors
     //   ? error?.data?.errors ?? (codeMessage[response.status] || response.statusText)
     //   : error?.data?.title;
-    const {status, url, ...params} = response;
+    const { status, url, ...params } = response;
     if (status == 404) {
       notification.info({
         message: 'Tài nguyên trống',
@@ -66,39 +66,37 @@ request.interceptors.response.use((response, option) => {
   const { method } = option;
   switch (status) {
     case 200:
-      if (method !== 'GET')
-          message.success(codeMessage[200]);
+      if (method !== 'GET') message.success(codeMessage[200]);
       break;
-      case 201:
-        if (method !== 'GET')
-          message.success(codeMessage[201]);
-        break;
-      case 401:
-        notification.error({
-          message: 'Unauthorization',
-          description: 'Not Logged in. Please Loggin',
-        });
-        /* eslint-disable no-underscore-dangle */
-        // logOut();
-        // location.href = '/login';
-        // setTimeout(() => {
-        //   window.g_app._store.dispatch({
-        //     type: 'login/logout',
-        //   });
-        // }, 3000);
-        break;
-      case 403:
-        notification.error({
-          message: response.statusText,
-          description: `Your request to ${response.url} was forbiden`,
-        });
-        break;
-      case 405:
-        notification.error({
-          message: response.statusText,
-          description: `${response.body.message}`,
-        });
-        break; 
+    case 201:
+      if (method !== 'GET') message.success(codeMessage[201]);
+      break;
+    case 401:
+      notification.error({
+        message: 'Unauthorization',
+        description: 'Not Logged in. Please Loggin',
+      });
+      /* eslint-disable no-underscore-dangle */
+      // logOut();
+      // location.href = '/login';
+      // setTimeout(() => {
+      //   window.g_app._store.dispatch({
+      //     type: 'login/logout',
+      //   });
+      // }, 3000);
+      break;
+    case 403:
+      notification.error({
+        message: response.statusText,
+        description: `Your request to ${response.url} was forbiden`,
+      });
+      break;
+    case 405:
+      notification.error({
+        message: response.statusText,
+        description: `${response.body.message}`,
+      });
+      break;
     default:
       break;
   }

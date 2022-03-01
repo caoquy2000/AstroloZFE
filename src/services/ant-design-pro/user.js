@@ -16,16 +16,13 @@ export const getUsers = async (params) => {
     });
 };
 
-export const addUser =  (body) => {
-  return request
-    .post('/api/User', {data: body});
-    
-}
+export const addUser = (body) => {
+  return request.post('/api/User', { data: body });
+};
 
 export const editUser = (userId, body) => {
-  return request
-    .put(`/api/User/${userId}`, {data: body});
-}
+  return request.put(`/api/User/${userId}`, { data: body });
+};
 
 // export const searchUser = (params) => {
 //   return request
