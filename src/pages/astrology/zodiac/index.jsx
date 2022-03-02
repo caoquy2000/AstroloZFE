@@ -1,10 +1,11 @@
 import React from 'react';
-import { Button, message } from 'antd';
+import { Button, message, Space, Image } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import ModalForm from '@/components/ModalForm';
 import { uploadFile } from '@/utils/uploadFile';
+import { addZodiac, getZodiacs } from '@/services/ant-design-pro/zodiac';
 
 const Zodiac = () => {
   const column = [
@@ -13,10 +14,11 @@ const Zodiac = () => {
       dataIndex: 'number',
       sorter: (a, b) => a.number - b.number,
       search: false,
+      width: '25%',
     },
     {
       title: 'Zodiac Name',
-      dataIndex: 'zodiacName',
+      dataIndex: 'name',
       copyable: true,
       sorter: (a, b) => a.zodiacName.localeCompare(b.zodiacName),
       filters: true,
@@ -29,40 +31,22 @@ const Zodiac = () => {
           },
         ],
       },
+      width: '25%',
     },
-    {
-      title: 'Zodiac Day Start',
-      dataIndex: 'zodiacDayStart',
-      copyable: true,
-      sorter: (a, b) => a.zodiacDayStart.localeCompare(b.zodiacDayStart),
-      search: false,
-    },
-    {
-      title: 'Zodiac Month Start',
-      dataIndex: 'zodiacMonthStart',
-      copyable: true,
-      sorter: (a, b) => a.zodiacMonthStart.localeCompare(b.zodiacMonthStart),
-      search: false,
-    },
-    {
-      title: 'Zodiac Day End',
-      dataIndex: 'zodiacDayEnd',
-      copyable: true,
-      sorter: (a, b) => a.zodiacDayEnd.localeCompare(b.zodiacDayEnd),
-      search: false,
-    },
-    {
-      title: 'Zodiac Month End',
-      dataIndex: 'zodiacMonthEnd',
-      copyable: true,
-      sorter: (a, b) => a.zodiacMonthEnd.localeCompare(b.zodiacMonthEnd),
-      search: false,
-    },
+
     {
       title: 'Zodiac Icon',
-      dataIndex: 'zodiacIcon',
+      dataIndex: 'icon',
       copyable: true,
       search: false,
+      render: (_, record) => {
+        return (
+          <Space>
+            <Image width={50} src={record.icon} />
+          </Space>
+        );
+      },
+      width: '25%',
     },
     {
       title: 'Action',
@@ -70,8 +54,20 @@ const Zodiac = () => {
       search: false,
       render: (_, record) => {
         return (
-          <div>
-            <div>
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: '50%',
+                marginRight: '8px',
+              }}
+            >
               <Button
                 key="editZodiac"
                 type="primary"
@@ -83,7 +79,11 @@ const Zodiac = () => {
                 Edit
               </Button>
             </div>
-            <div>
+            <div
+              style={{
+                width: '50%',
+              }}
+            >
               <Button
                 key="deleteZodiac"
                 type="danger"
@@ -97,6 +97,7 @@ const Zodiac = () => {
           </div>
         );
       },
+      width: '25%',
     },
   ];
 
@@ -209,18 +210,17 @@ const Zodiac = () => {
   const [formFieldAddZodiac, setFormFieldAddZodiac] = React.useState(formFieldAdd);
   const [formFieldEditZodiac, setFormFieldEditZodiac] = React.useState(formFieldEdit);
 
-  //xuliLoadingImg
-  const handleChangeImg = (info) => {
-    console.log('info', info);
-    if (info.file.status === 'uploading') {
-      setLoadingUploadingImgFirebase(true);
-      return;
+  //xuli loading upload img firebase
+  React.useEffect(() => {
+    if (loadingUploadImgFirebase) {
+      message.loading('Uploading', 9999);
+    } else {
+      message.destroy();
     }
-    if (info.file.status === 'done') {
-      setLoadingUploadingImgFirebase(false);
-      return;
-    }
-  };
+    return () => {
+      message.destroy();
+    };
+  }, [loadingUploadImgFirebase]);
 
   //xuli cua upload img
   const beforeUpload = (file) => {
@@ -238,16 +238,19 @@ const Zodiac = () => {
   //customupload img
   const customUpload = async ({ onError, onSuccess, file }) => {
     try {
+      setLoadingUploadingImgFirebase(true);
       const imgLink = await uploadFile(file, 'zodiac');
-      console.log('imgLinkAddZodiacComponent:', imgLink);
+
       if (imgLink) {
         setImgLinkFirebase(imgLink);
         formZodiacRef?.current?.setFieldsValue({
           ['zodiacIcon']: imgLink,
         });
+        setLoadingUploadingImgFirebase(false);
         message.success('Upload Image Success!');
       }
     } catch (error) {
+      setLoadingUploadingImgFirebase(false);
       onError(error);
     }
   };
@@ -257,6 +260,7 @@ const Zodiac = () => {
     setShowModal(!showModal);
     setFlagEditForm('');
     setZodiacRecord(null);
+    setImgLinkFirebase(null);
   };
 
   //xuli dong modal
@@ -265,16 +269,25 @@ const Zodiac = () => {
     setButtonLoading(false);
     setFlagEditForm('');
     setZodiacRecord(null);
+    setImgLinkFirebase(null);
     if (formZodiacRef) {
       formZodiacRef?.current?.resetFields();
     }
+  };
+
+  //xuli reset form
+  const handleResetForm = () => {
+    formZodiacRef?.current?.resetFields();
+    setImgLinkFirebase(null);
   };
 
   //xuli submit form
   const handleSubmitFormZodiac = async (values) => {
     setButtonLoading(true);
     console.log('valuesForm', values);
-    console.log('fullHTML', editorRef?.current);
+    await addZodiac(values);
+    handleCancelModal();
+    tableZodiacRef?.current?.reload();
     setButtonLoading(false);
   };
 
@@ -349,6 +362,32 @@ const Zodiac = () => {
               Add
             </Button>,
           ]}
+          request={async (params, sort, filter) => {
+            const currentAttr = 'current';
+            const pageSizeAttr = 'pageSize';
+            const newParams = Object.keys(params).reduce((item, key) => {
+              if (key != currentAttr && key != pageSizeAttr) {
+                if (key === 'zodiacName') {
+                  item.name = params[key];
+                } else {
+                  item[key] = params[key];
+                }
+              }
+              return item;
+            }, {});
+            console.log('params', newParams);
+            const data = [];
+            await getZodiacs(newParams).then((res) => {
+              res?.map((item, index) => {
+                item.number = index + 1;
+                data[index] = item;
+              });
+            });
+            return {
+              data: data,
+              success: true,
+            };
+          }}
         />
       </PageContainer>
       <ModalForm
@@ -361,13 +400,13 @@ const Zodiac = () => {
         handleSubmitForm={handleSubmitFormZodiac}
         formField={formFieldAddZodiac}
         beforeUpload={beforeUpload}
-        onChange={handleChangeImg}
         customUpload={customUpload}
         imgLinkFirebase={imgLinkFirebase}
         stateEditor={stateEditor}
         handleChangeStateEditor={handleChangeStateEditor}
         editorRef={editorRef}
         handleUploadImgInEditor={handleUploadImgInEditor}
+        handleResetForm={handleResetForm}
       />
     </>
   );

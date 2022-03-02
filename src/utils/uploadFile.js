@@ -3,7 +3,6 @@ import { storage } from './firebase';
 
 export const uploadFile = async (file, folder) => {
   try {
-    console.log(file);
     let imgLink;
     const storageRef = storage.ref();
     const fileRef = storageRef.child(`${folder}/${file.name}`);

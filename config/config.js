@@ -29,8 +29,8 @@ export default defineConfig({
     loading: '@/components/Loading',
   },
   define: {
-    API_BATCH_URL: 'https://20.124.25.10',
-    API_URL: 'https://20.124.25.10',
+    API_BATCH_URL: 'https://stg-api.tranastro.com',
+    API_URL: 'https://stg-api.tranastro.com',
   },
   targets: {
     ie: 11,

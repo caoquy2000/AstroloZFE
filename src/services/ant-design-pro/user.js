@@ -2,7 +2,7 @@ import request from '@/utils/requestServer';
 
 export const getUsers = async (params) => {
   return await request
-    .get('/api/User', {
+    .get('/api/v1/user', {
       params: params,
     })
     .then((response) => {
@@ -17,11 +17,11 @@ export const getUsers = async (params) => {
 };
 
 export const addUser = (body) => {
-  return request.post('/api/User', { data: body });
+  return request.post('/api/v1/user', { data: body });
 };
 
 export const editUser = (userId, body) => {
-  return request.put(`/api/User/${userId}`, { data: body });
+  return request.put(`/api/v1/user/{id}${userId}`, { data: body });
 };
 
 // export const searchUser = (params) => {
