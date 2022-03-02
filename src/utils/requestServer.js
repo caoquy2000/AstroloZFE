@@ -51,7 +51,7 @@ const errorHandler = (error) => {
 };
 
 const request = extend({
-  prefix: 'https://20.124.25.10',
+  prefix: 'https://stg-api.tranastro.com',
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
