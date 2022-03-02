@@ -8,43 +8,7 @@ import ModalForm from '@/components/ModalForm';
 import { getUsers } from '@/services/ant-design-pro/user';
 import { addUser } from '@/services/ant-design-pro/user';
 import { editUser } from '@/services/ant-design-pro/user';
-// const data = [
-//   {
-//     id: 1,
-//     number: 1,
-//     userName: 'Cao Hoàng Quy',
-//     phoneNumber: '0914682425',
-//     status: 1,
-//   },
-//   {
-//     id: 2,
-//     number: 2,
-//     userName: 'Nguyễn Văn Hiếu',
-//     phoneNumber: '0914682426',
-//     status: 1,
-//   },
-//   {
-//     id: 3,
-//     number: 3,
-//     userName: 'Cao Hoàng Phát Lộc',
-//     phoneNumber: '0914682427',
-//     status: 1,
-//   },
-//   {
-//     id: 4,
-//     number: 4,
-//     userName: 'Trần Văn A',
-//     phoneNumber: '0914682425',
-//     status: 0,
-//   },
-//   {
-//     id: 5,
-//     number: 5,
-//     userName: 'Phạm Thanh Tùng',
-//     phoneNumber: '0914682427',
-//     status: 0,
-//   },
-// ];
+import { useModel } from 'umi';
 
 const User = () => {
   //config column
@@ -244,6 +208,7 @@ const User = () => {
   const [buttonSubmitterUser, setButtonSubmitterUser] = React.useState(buttonSubmitter);
   const [formFieldAddUser, setFormFieldAddUser] = React.useState(formFieldAdd);
   const [formFieldEditUser, setFormFieldEditUser] = React.useState(formFieldEdit);
+  const { initialState, setInitialState } = useModel('@@initialState');
 
   React.useEffect(() => {
     const newButtonSubmitUser = buttonSubmitterUser.map((item) => {

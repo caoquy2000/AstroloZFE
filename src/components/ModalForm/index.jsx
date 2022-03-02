@@ -25,8 +25,7 @@ const ModalForm = (props) => {
     buttonSubmitter,
     handleSubmitForm,
     formField,
-    beforeUpload,
-
+    listImgLinkFirebase,
     customUpload,
     imgLinkFirebase,
     stateEditor,
@@ -61,15 +60,12 @@ const ModalForm = (props) => {
       uid: '-1',
       name: '',
       status: 'done',
-
       thumbUrl: imgLinkFirebase,
     },
   ]);
   // xuli khi co link img de bo vao preview
   React.useEffect(() => {
-    console.log('imgLink', imgLinkFirebase);
     if (imgLinkFirebase) {
-      console.log('A');
       const newFileList = [];
       fileList.map((item) => {
         item['thumbUrl'] = imgLinkFirebase;
@@ -79,7 +75,6 @@ const ModalForm = (props) => {
     }
     return () => {
       const newFileList = [];
-      console.log('B');
       fileList.map((item) => {
         item['thumbUrl'] = null;
         newFileList.push(item);
@@ -87,6 +82,30 @@ const ModalForm = (props) => {
       setFileList(newFileList);
     };
   }, [imgLinkFirebase]);
+
+  React.useEffect(() => {
+    // set lai list img
+    if (listImgLinkFirebase) {
+      if (listImgLinkFirebase.length > 0) {
+        const newFileList = [];
+        listImgLinkFirebase.map((item, index) => {
+          newFileList.push(item);
+        });
+        setFileList(newFileList);
+      }
+    }
+
+    return () => {
+      setFileList([
+        {
+          uid: '-1',
+          name: '',
+          status: 'done',
+          thumbUrl: imgLinkFirebase,
+        },
+      ]);
+    };
+  }, [listImgLinkFirebase]);
 
   const handleCancelModelChild = (valuses) => {
     if (handleCancelModel) {
@@ -106,15 +125,6 @@ const ModalForm = (props) => {
   const handleButtonSubmitForm = (value) => {
     if (value) {
       value.form?.submit();
-    }
-  };
-
-  //xuliLoadingImg
-  const handleChangeImg = (info) => {};
-
-  const beforeUploadChild = (file) => {
-    if (beforeUpload) {
-      beforeUpload(file);
     }
   };
 
@@ -259,26 +269,24 @@ const ModalForm = (props) => {
 
                     <Upload
                       name={item?.nameUpload}
-                      beforeUpload={beforeUploadChild}
-                      onChange={handleChangeImg}
                       customRequest={customUploadChild}
                       listType="picture-card"
-                      previewImage={imgLinkFirebase}
                       fileList={fileList}
                     >
                       {imgLinkFirebase ? null : uploadButton}
                     </Upload>
-                    {/* {imgLinkFirebase && (
-                      <Space
-                        size="middle"
-                        align="center"
-                        style={{
-                          marginBottom: '20px',
-                        }}
-                      >
-                        <Image width={100} src={imgLinkFirebase} />
-                      </Space>
-                    )} */}
+                  </ProForm.Group>
+                )}
+                {item?.fieldType === 'uploadListImg' && (
+                  <ProForm.Group>
+                    <Upload
+                      name={item?.nameUpload}
+                      customRequest={customUploadChild}
+                      listType="picture-card"
+                      fileList={fileList}
+                    >
+                      {fileList.length >= 3 ? null : uploadButton}
+                    </Upload>
                   </ProForm.Group>
                 )}
                 {item?.fieldType === 'formTextArea' && (
