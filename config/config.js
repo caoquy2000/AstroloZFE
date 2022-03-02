@@ -113,6 +113,18 @@ export default defineConfig({
           component: './shop/users',
         },
         {
+          path: '/shop/productmaster',
+          name: 'ProductMaster',
+          access: 'canAdmin',
+          component: './shop/productmaster',
+        },
+        {
+          path: '/shop/productvariant',
+          name: 'ProductVariant',
+          access: 'canAdmin',
+          component: './shop/productvariant',
+        },
+        {
           component: './404',
         },
       ],

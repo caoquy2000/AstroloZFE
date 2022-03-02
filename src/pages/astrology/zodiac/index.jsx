@@ -222,21 +222,20 @@ const Zodiac = () => {
     };
   }, [loadingUploadImgFirebase]);
 
-  //xuli cua upload img
-  const beforeUpload = (file) => {
+  //customupload img
+  const customUpload = async ({ onError, onSuccess, file }) => {
     const isImage = file.type.indexOf('image/') === 0;
     if (!isImage) {
+      setLoadingUploadingImgFirebase(false);
+      message.destroy();
       message.error('You can only upload IMAGE file!');
+      return isImage;
     }
     const isLt4M = file.size / 1024 / 1024 < 4;
     if (!isLt4M) {
       message.error('Image must smaller than 4MB!');
+      return isLt4M;
     }
-    return isImage && isLt4M;
-  };
-
-  //customupload img
-  const customUpload = async ({ onError, onSuccess, file }) => {
     try {
       setLoadingUploadingImgFirebase(true);
       const imgLink = await uploadFile(file, 'zodiac');
@@ -399,7 +398,6 @@ const Zodiac = () => {
         buttonSubmitter={buttonSubmitterZodiac}
         handleSubmitForm={handleSubmitFormZodiac}
         formField={formFieldAddZodiac}
-        beforeUpload={beforeUpload}
         customUpload={customUpload}
         imgLinkFirebase={imgLinkFirebase}
         stateEditor={stateEditor}
