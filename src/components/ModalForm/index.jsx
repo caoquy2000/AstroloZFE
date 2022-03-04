@@ -143,6 +143,7 @@ const ModalForm = (props) => {
   const handleImg = () => {
     handleUploadImgInEditor();
   };
+  const handleTest = () => {};
 
   const uploadButton = (
     <div>
