@@ -97,6 +97,7 @@ export async function getInitialState() {
 export const layout = ({ initialState, setInitialState }) => {
   // Mac dinh phai set ngon ngu trong app vi config bi loi
   setLocale('en-US');
+  console.log(initialState?.settings);
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,

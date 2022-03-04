@@ -29,8 +29,8 @@ export default defineConfig({
     loading: '@/components/Loading',
   },
   define: {
-    API_BATCH_URL: 'https://stg-api.tranastro.com',
-    API_URL: 'https://stg-api.tranastro.com',
+    API_BATCH_URL: REACT_APP_ENV == 'dev' ? 'https://20.124.25.10' : 'https://20.124.25.10',
+    API_URL: REACT_APP_ENV == 'dev' ? 'https://20.124.25.10' : 'https://stg-api.tranastro.com',
   },
   targets: {
     ie: 11,
@@ -144,6 +144,42 @@ export default defineConfig({
           name: 'Zodiac',
           // icon: 'smile',
           component: './astrology/zodiac',
+        },
+        {
+          path: '/astrology/house',
+          name: 'House',
+          // icon: 'smile',
+          component: './astrology/house',
+        },
+        {
+          path: '/astrology/news',
+          name: 'News',
+          // icon: 'smile',
+          component: './astrology/news',
+        },
+        {
+          path: '/astrology/planet',
+          name: 'Planet',
+          // icon: 'smile',
+          component: './astrology/planet',
+        },
+        {
+          path: '/astrology/planethouse',
+          name: 'PlanetHouse',
+          // icon: 'smile',
+          component: './astrology/planethouse',
+        },
+        {
+          path: '/astrology/planetzodiac',
+          name: 'PlanetZodiac',
+          // icon: 'smile',
+          component: './astrology/planetzodiac',
+        },
+        {
+          path: '/astrology/zodiachouse',
+          name: 'ZodiacHouse',
+          // icon: 'smile',
+          component: './astrology/zodiachouse',
         },
         {
           component: './404',

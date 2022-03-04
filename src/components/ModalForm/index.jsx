@@ -156,7 +156,7 @@ const ModalForm = (props) => {
         visible={showModal}
         title={titleModal}
         centered={true}
-        width={widthModal ? widthModal : ''}
+        width={widthModal}
         onCancel={() => handleCancelModelChild()}
         footer={[
           <Button key="cancelModel" type="danger" onClick={() => handleCancelModelChild()}>
@@ -313,6 +313,7 @@ const ModalForm = (props) => {
                       value={stateEditor}
                       style={{
                         marginBottom: '20px',
+                        width: '900px',
                       }}
                       modules={{
                         toolbar: {

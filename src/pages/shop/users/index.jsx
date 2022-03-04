@@ -292,33 +292,47 @@ const User = () => {
           request={async (params, sort, filter) => {
             const currentAttr = 'current';
             const pageSizeAttr = 'pageSize';
-            const newParams = Object.keys(params).reduce((item, key) => {
-              if (key != currentAttr && key != pageSizeAttr) {
-                if (key === 'userName') {
-                  item.name = params[key];
-                } else if (key === 'phoneNumber') {
-                  item.phone = params[key];
-                } else if (key === 'status') {
-                  if (params[key].toString().toLowerCase() === 'active') {
-                    item.status = 1;
-                  } else if (params[key].toString().toLowerCase() === 'unactive') {
-                    item.status = 0;
-                  }
-                } else {
-                  item[key] = params[key];
-                }
-              }
-              return item;
-            }, {});
-            console.log('params', newParams);
             const data = [];
-            await getUsers(newParams).then((res) => {
-              console.log('res at table query', res);
-              res?.map((item, index) => {
-                item.number = index + 1;
-                data[index] = item;
+            console.log(params);
+            if (params.userName || params.phoneNumber || params.status) {
+              console.log('A');
+              const newParams = Object.keys(params).reduce((item, key) => {
+                if (key != currentAttr && key != pageSizeAttr) {
+                  if (key === 'userName') {
+                    item.name = params[key];
+                  } else if (key === 'phoneNumber') {
+                    item.phone = params[key];
+                  } else if (key === 'status') {
+                    if (params[key].toString().toLowerCase() === 'active') {
+                      item.status = 1;
+                    } else if (params[key].toString().toLowerCase() === 'unactive') {
+                      item.status = 0;
+                    }
+                  } else {
+                    item[key] = params[key];
+                  }
+                }
+                return item;
+              }, {});
+              console.log('params', newParams);
+              await getUsers(newParams).then((res) => {
+                console.log('res at table query', res);
+                res?.map((item, index) => {
+                  item.number = index + 1;
+                  data[index] = item;
+                });
               });
-            });
+            } else {
+              console.log('B');
+              await getUsers(params).then((res) => {
+                console.log('res at table query', res);
+                res?.map((item, index) => {
+                  item.number = index + 1;
+                  data[index] = item;
+                });
+              });
+            }
+
             return {
               data: data,
               success: true,

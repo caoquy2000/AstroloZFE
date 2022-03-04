@@ -187,11 +187,87 @@ const Zodiac = () => {
     },
     {
       fieldType: 'zodiacEditorMainContent',
-      nameTextArea: 'mainContent',
+      nameTextArea: 'zodiacMainContent',
     },
   ];
 
-  const formFieldEdit = [];
+  const formFieldEdit = [
+    {
+      fieldType: 'formText',
+      key: 'fieldEditZodiacName',
+      label: 'Zodiac Name',
+      width: 'lg',
+      placeholder: 'Enter Zodiac Name',
+      name: 'name',
+      requiredField: 'true',
+      ruleMessage: 'Input Zodiac Name before submit',
+    },
+    {
+      fieldType: 'formCalendar',
+      labelTimeDay: 'Zodiac Time Day Start',
+      nameTimeDay: 'zodiacDayStart',
+      minTimeDay: '1',
+      maxTimeDay: '31',
+      placeholderTimeDay: 'Zodiac Day Start',
+      controlsTimeDay: 'false',
+
+      labelTimeMonth: 'Zodiac Time Month Start',
+      nameTimeMonth: 'zodiacMonthStart',
+      minTimeMonth: '1',
+      maxTimeMonth: '12',
+      placeholderTimeMonth: 'Zodiac Month Start',
+      controlsTimeMonth: 'false',
+    },
+    {
+      fieldType: 'formCalendar',
+      labelTimeDay: 'Zodiac Time Day End',
+      nameTimeDay: 'zodiacDayEnd',
+      minTimeDay: '1',
+      maxTimeDay: '31',
+      placeholderTimeDay: 'Zodiac Day End',
+      controlsTimeDay: 'false',
+
+      fieldType: 'formCalendar',
+      labelTimeMonth: 'Zodiac Time Month End',
+      nameTimeMonth: 'zodiacMonthEnd',
+      minTimeMonth: '1',
+      maxTimeMonth: '12',
+      placeholderTimeMonth: 'Zodiac Month End',
+      controlsTimeMonth: 'false',
+    },
+    {
+      fieldType: 'formInputFileImg',
+      key: 'fieldGetImgLink',
+      label: 'Zodiac Icon',
+      width: 'lg',
+      placeholder: 'Icon Link',
+      name: 'icon',
+      nameUpload: 'iconZodiac',
+      nameInputFile: 'zodiacFileToFirebase',
+      readOnly: 'true',
+      requiredField: 'true',
+      ruleMessage: 'Upload image before submit',
+    },
+    {
+      fieldType: 'formTextArea',
+      key: 'fieldAddZodiacDescription',
+      label: 'Description',
+      width: 'lg',
+      placeholder: 'Enter Zodiac description',
+      name: 'descreiption',
+      requiredField: 'true',
+      ruleMessage: 'Input description before submit',
+    },
+    {
+      fieldType: 'zodiacEditorMainContent',
+      nameTextArea: 'mainContent',
+    },
+    {
+      fieldType: 'checkEdit',
+      name: 'edit',
+      value: 'edit',
+    },
+  ];
 
   const tableZodiacRef = React.useRef();
   const formZodiacRef = React.useRef();
@@ -221,6 +297,14 @@ const Zodiac = () => {
       message.destroy();
     };
   }, [loadingUploadImgFirebase]);
+
+  //xuli pass zodiac record
+  React.useEffect(() => {
+    if (zodiacRecord) {
+      formZodiacRef?.current?.setFieldsValue(zodiacRecord);
+      setStateEditor(zodiacRecord.mainContent);
+    }
+  }, [zodiacRecord]);
 
   //customupload img
   const customUpload = async ({ onError, onSuccess, file }) => {
@@ -269,6 +353,7 @@ const Zodiac = () => {
     setFlagEditForm('');
     setZodiacRecord(null);
     setImgLinkFirebase(null);
+    setStateEditor(null);
     if (formZodiacRef) {
       formZodiacRef?.current?.resetFields();
     }
@@ -283,9 +368,12 @@ const Zodiac = () => {
   //xuli submit form
   const handleSubmitFormZodiac = async (values) => {
     setButtonLoading(true);
-    console.log('valuesForm', values);
-    await addZodiac(values);
-    handleCancelModal();
+    if (values.edit) {
+      console.log('valuesForm', values);
+    } else {
+      await addZodiac(values);
+      handleResetForm();
+    }
     tableZodiacRef?.current?.reload();
     setButtonLoading(false);
   };
@@ -294,6 +382,7 @@ const Zodiac = () => {
   const handleEditZodiacForm = (record) => {
     setFlagEditForm('edit');
     setShowModal(!showModal);
+    console.log(record);
     setZodiacRecord(record);
   };
 
@@ -303,7 +392,7 @@ const Zodiac = () => {
       // setStateEditor(state);
       console.log('stateEditor', state);
       formZodiacRef?.current?.setFieldsValue({
-        ['mainContent']: state,
+        ['zodiacMainContent']: state,
       });
     }
   };
@@ -339,7 +428,6 @@ const Zodiac = () => {
       <PageContainer>
         <ProTable
           columns={column}
-          onReset
           actionRef={tableZodiacRef}
           pagination={{
             pageSize: 8,
@@ -364,24 +452,36 @@ const Zodiac = () => {
           request={async (params, sort, filter) => {
             const currentAttr = 'current';
             const pageSizeAttr = 'pageSize';
-            const newParams = Object.keys(params).reduce((item, key) => {
-              if (key != currentAttr && key != pageSizeAttr) {
-                if (key === 'zodiacName') {
-                  item.name = params[key];
-                } else {
-                  item[key] = params[key];
-                }
-              }
-              return item;
-            }, {});
-            console.log('params', newParams);
+            console.log(params);
             const data = [];
-            await getZodiacs(newParams).then((res) => {
-              res?.map((item, index) => {
-                item.number = index + 1;
-                data[index] = item;
+            if (params.name) {
+              const newParams = Object.keys(params).reduce((item, key) => {
+                if (key != currentAttr && key != pageSizeAttr) {
+                  if (key === 'zodiacName') {
+                    item.name = params[key];
+                  } else {
+                    item[key] = params[key];
+                  }
+                }
+                return item;
+              }, {});
+              console.log('params', newParams);
+
+              await getZodiacs(newParams).then((res) => {
+                res?.map((item, index) => {
+                  item.number = index + 1;
+                  data[index] = item;
+                });
               });
-            });
+            } else {
+              await getZodiacs(params).then((res) => {
+                res?.map((item, index) => {
+                  item.number = index + 1;
+                  data[index] = item;
+                });
+              });
+            }
+
             return {
               data: data,
               success: true,
@@ -389,23 +489,43 @@ const Zodiac = () => {
           }}
         />
       </PageContainer>
-      <ModalForm
-        showModal={showModal}
-        titleModal="Add New Zodiac"
-        widthModal="900"
-        handleCancelModel={handleCancelModal}
-        formRef={formZodiacRef}
-        buttonSubmitter={buttonSubmitterZodiac}
-        handleSubmitForm={handleSubmitFormZodiac}
-        formField={formFieldAddZodiac}
-        customUpload={customUpload}
-        imgLinkFirebase={imgLinkFirebase}
-        stateEditor={stateEditor}
-        handleChangeStateEditor={handleChangeStateEditor}
-        editorRef={editorRef}
-        handleUploadImgInEditor={handleUploadImgInEditor}
-        handleResetForm={handleResetForm}
-      />
+      {flagEditForm === 'edit' ? (
+        <ModalForm
+          showModal={showModal}
+          titleModal={`Edit ${zodiacRecord.name}`}
+          widthModal="900"
+          handleCancelModel={handleCancelModal}
+          formRef={formZodiacRef}
+          buttonSubmitter={buttonSubmitterZodiac}
+          handleSubmitForm={handleSubmitFormZodiac}
+          formField={formFieldEditZodiac}
+          customUpload={customUpload}
+          imgLinkFirebase={imgLinkFirebase}
+          stateEditor={stateEditor}
+          handleChangeStateEditor={handleChangeStateEditor}
+          editorRef={editorRef}
+          handleUploadImgInEditor={handleUploadImgInEditor}
+          handleResetForm={handleResetForm}
+        />
+      ) : (
+        <ModalForm
+          showModal={showModal}
+          titleModal="Add New Zodiac"
+          widthModal="900"
+          handleCancelModel={handleCancelModal}
+          formRef={formZodiacRef}
+          buttonSubmitter={buttonSubmitterZodiac}
+          handleSubmitForm={handleSubmitFormZodiac}
+          formField={formFieldAddZodiac}
+          customUpload={customUpload}
+          imgLinkFirebase={imgLinkFirebase}
+          stateEditor={stateEditor}
+          handleChangeStateEditor={handleChangeStateEditor}
+          editorRef={editorRef}
+          handleUploadImgInEditor={handleUploadImgInEditor}
+          handleResetForm={handleResetForm}
+        />
+      )}
     </>
   );
 };
