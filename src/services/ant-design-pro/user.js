@@ -21,7 +21,12 @@ export const addUser = (body) => {
 };
 
 export const editUser = (userId, body) => {
-  return request.put(`/api/v1/user/{id}${userId}`, { data: body });
+  return request.put('/api/v1/user', {
+    params: {
+      id: userId,
+    },
+    data: body,
+  });
 };
 
 // export const searchUser = (params) => {

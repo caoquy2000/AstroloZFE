@@ -19,3 +19,16 @@ export const getZodiacs = async (params) => {
       console.log('errorGetZodiacs', error);
     });
 };
+
+export const deleteZodiac = (zodiacId) => {
+  return request.delete(`/api/v1/zodiac/${zodiacId}`);
+};
+
+export const updateZodiac = (zodiacId, body) => {
+  return request.put('/api/v1/zodiac', {
+    params: {
+      id: zodiacId,
+    },
+    data: body,
+  });
+};

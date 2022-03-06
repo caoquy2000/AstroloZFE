@@ -7,12 +7,8 @@ function showConfirm({ title, icon, content, handleOk, handleCancel }) {
     title: title,
     icon: icon,
     content: content,
-    onOk() {
-      handleOk();
-    },
-    onCancel() {
-      handleCancel();
-    },
+    onOk: handleOk,
+    onCancel: handleCancel,
   });
 }
 

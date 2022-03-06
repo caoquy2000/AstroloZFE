@@ -1,11 +1,22 @@
 import React from 'react';
 import { Button, message, Space, Image } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import ModalForm from '@/components/ModalForm';
 import { uploadFile } from '@/utils/uploadFile';
-import { addZodiac, getZodiacs } from '@/services/ant-design-pro/zodiac';
+import {
+  addZodiac,
+  getZodiacs,
+  deleteZodiac,
+  updateZodiac,
+} from '@/services/ant-design-pro/zodiac';
+import showConfirm from '@/components/ModalConfirm';
 
 const Zodiac = () => {
   const column = [
@@ -90,6 +101,7 @@ const Zodiac = () => {
                 size="middle"
                 block="true"
                 icon={<DeleteOutlined />}
+                onClick={() => handleOkDeleteZodiac(record)}
               >
                 Delete
               </Button>
@@ -186,7 +198,7 @@ const Zodiac = () => {
       ruleMessage: 'Input description before submit',
     },
     {
-      fieldType: 'zodiacEditorMainContent',
+      fieldType: 'EditorMainContent',
       nameTextArea: 'zodiacMainContent',
     },
   ];
@@ -259,7 +271,7 @@ const Zodiac = () => {
       ruleMessage: 'Input description before submit',
     },
     {
-      fieldType: 'zodiacEditorMainContent',
+      fieldType: 'EditorMainContent',
       nameTextArea: 'mainContent',
     },
     {
@@ -297,6 +309,17 @@ const Zodiac = () => {
       message.destroy();
     };
   }, [loadingUploadImgFirebase]);
+
+  //xuli loading button submit form add or edit zodiac
+  React.useEffect(() => {
+    const newButtonSubmitZodiac = buttonSubmitterZodiac.map((item) => {
+      if (item.name === 'Submit') {
+        item.loading = buttonLoading;
+      }
+      return item;
+    });
+    setButtonSubmitterZodiac(newButtonSubmitZodiac);
+  }, [buttonLoading]);
 
   //xuli pass zodiac record
   React.useEffect(() => {
@@ -369,10 +392,29 @@ const Zodiac = () => {
   const handleSubmitFormZodiac = async (values) => {
     setButtonLoading(true);
     if (values.edit) {
-      console.log('valuesForm', values);
+      console.log('valuesFormBeforeFix', values);
+      const newValues = Object.assign({}, values);
+      const attr = 'edit';
+      const dataEdit = Object.keys(newValues).reduce((item, key) => {
+        if (key !== attr) {
+          item[key] = newValues[key];
+        }
+        return item;
+      }, {});
+      dataEdit.zodiacDescription = dataEdit.descreiption;
+      delete dataEdit.descreiption;
+      dataEdit.zodiacName = dataEdit.name;
+      delete dataEdit.name;
+      dataEdit.zodiacIcon = dataEdit.icon;
+      delete dataEdit.icon;
+      dataEdit.zodiacMainContent = dataEdit.mainContent;
+      delete dataEdit.mainContent;
+      console.log('dataEdit', dataEdit);
+      await updateZodiac(zodiacRecord.id, dataEdit);
     } else {
       await addZodiac(values);
       handleResetForm();
+      setStateEditor(null);
     }
     tableZodiacRef?.current?.reload();
     setButtonLoading(false);
@@ -382,8 +424,15 @@ const Zodiac = () => {
   const handleEditZodiacForm = (record) => {
     setFlagEditForm('edit');
     setShowModal(!showModal);
-    console.log(record);
     setZodiacRecord(record);
+  };
+
+  //xuli delete zodiac
+  const handleOkDeleteZodiac = async (record) => {
+    const result = await deleteZodiac(record.id);
+    if (result) {
+      tableZodiacRef?.current?.reload();
+    }
   };
 
   //xuli change text in editor
@@ -474,6 +523,7 @@ const Zodiac = () => {
                 });
               });
             } else {
+              params.pageSize = 12;
               await getZodiacs(params).then((res) => {
                 res?.map((item, index) => {
                   item.number = index + 1;

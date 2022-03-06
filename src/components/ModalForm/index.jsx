@@ -143,8 +143,7 @@ const ModalForm = (props) => {
   const handleImg = () => {
     handleUploadImgInEditor();
   };
-  const handleTest = () => {};
-  const handleTest2 = () => {};
+
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -307,7 +306,7 @@ const ModalForm = (props) => {
                     />
                   </ProForm.Group>
                 )}
-                {item?.fieldType === 'zodiacEditorMainContent' && (
+                {item?.fieldType === 'EditorMainContent' && (
                   <>
                     <ReactQuill
                       ref={editorRef}

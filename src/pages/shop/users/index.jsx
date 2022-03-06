@@ -268,7 +268,8 @@ const User = () => {
         return item;
       }, {});
       dataEdit.id = userRecord.id;
-      console.log(dataEdit);
+      console.log('dataEdit', dataEdit);
+      console.log('idDataEdit', userRecord.id);
       await editUser(userRecord.id, dataEdit);
     } else {
       // sử lí add user bình thường
