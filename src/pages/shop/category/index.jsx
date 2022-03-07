@@ -11,47 +11,8 @@ import {
 import { useState } from 'react';
 import styles from './index.less';
 import { values } from 'lodash';
-import ProForm, { ProFormText } from '@ant-design/pro-form';
-import showConfirm from '@/components/ModalConfirm';
 import ModalForm from '@/components/ModalForm';
-
-const data = [
-  {
-    id: 1,
-    number: 1,
-    name: 'Vòng Tay',
-  },
-  {
-    id: 2,
-    number: 2,
-    name: 'Nhẫn',
-  },
-  {
-    id: 3,
-    number: 3,
-    name: 'Áo',
-  },
-  {
-    id: 4,
-    number: 4,
-    name: 'Quần',
-  },
-  {
-    id: 5,
-    number: 5,
-    name: 'Vòng Tay',
-  },
-  {
-    id: 6,
-    number: 6,
-    name: 'Vòng Tay',
-  },
-  {
-    id: 7,
-    number: 7,
-    name: 'Áo',
-  },
-];
+import { addCategory, deleteCategory, getCategories, updateCategory } from '@/services/category';
 
 const Category = () => {
   const buttonSubmitter = [
@@ -77,7 +38,7 @@ const Category = () => {
       label: 'Name',
       width: 'lg',
       placeholder: 'Enter category name',
-      name: 'nameCategory',
+      name: 'name',
       requiredField: 'true',
       ruleMessage: 'Input category name before submit',
     },
@@ -115,7 +76,7 @@ const Category = () => {
       dataIndex: 'action',
       width: '20%',
       search: false,
-      render: (record, position, ...buttonProps) => {
+      render: (_, record) => {
         return (
           <div className={styles.column_ares}>
             <div className={styles.width_table_action}>
@@ -125,7 +86,7 @@ const Category = () => {
                 size="middle"
                 icon={<EditOutlined />}
                 block={true}
-                onClick={() => handleEditRecord(record, position, buttonProps)}
+                onClick={() => handleEditRecord(record)}
               >
                 Edit
               </Button>
@@ -137,15 +98,7 @@ const Category = () => {
                 size="middle"
                 icon={<DeleteOutlined />}
                 block={true}
-                onClick={() => {
-                  showConfirm({
-                    title: 'Do you Want to delete these items?',
-                    icon: <ExclamationCircleOutlined />,
-                    content: '',
-                    handleOk: handleOk,
-                    handleCancel: handleCancel,
-                  });
-                }}
+                onClick={() => handleDeleteCategory(record)}
               >
                 Delete
               </Button>
@@ -155,16 +108,36 @@ const Category = () => {
       },
     },
   ];
+  const formFieldEdit = [
+    {
+      fieldType: 'formText',
+      key: 'fieldAddNameCategory',
+      label: 'Name',
+      width: 'lg',
+      placeholder: 'Enter category name',
+      name: 'name',
+      requiredField: 'true',
+      ruleMessage: 'Input category name before submit',
+    },
+    {
+      fieldType: 'checkEdit',
+      name: 'edit',
+      value: 'edit',
+    },
+  ];
   const [showModal, setShowModel] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const [dataSource, setDataSource] = useState(null);
+  const [categoryRecord, setCategoryRecord] = useState(null);
+  const [flagEditForm, setFlagEditForm] = React.useState('');
   const [buttonSubmitterCategory, setButtonSubmitterCategory] = useState(buttonSubmitter);
   const [formFieldAddCategory, setFormFieldAddCategory] = useState(formField);
+  const [formFieldEditCategory, setFormFieldEditCategory] = useState(formFieldEdit);
   const actionRef = useRef();
   const formAddCategoryRef = useRef();
-  // const onSubmit = () => {
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(8);
+  const [total, setTotal] = React.useState(10);
 
-  // };
   React.useEffect(() => {
     const newButtonSubmitCategory = buttonSubmitterCategory.map((item, index) => {
       if (item.name === 'Submit') {
@@ -175,42 +148,68 @@ const Category = () => {
 
     setButtonSubmitterCategory(newButtonSubmitCategory);
   }, [buttonLoading]);
+
+  React.useEffect(() => {
+    if (categoryRecord) {
+      formAddCategoryRef?.current?.setFieldsValue(categoryRecord);
+    }
+  }, [categoryRecord]);
+
   const handleModal = () => {
     setShowModel(!showModal);
   };
 
   const handleCancelModel = () => {
     setShowModel(false);
+    setButtonLoading(false);
+    setFlagEditForm('');
+    setCategoryRecord(null);
     if (formAddCategoryRef) {
       formAddCategoryRef?.current?.resetFields();
     }
   };
 
-  const handleEditRecord = async (record, position, buttonProps) => {
+  //xuli reset form
+  const handleResetForm = () => {
+    formAddCategoryRef?.current?.resetFields();
+  };
+
+  const handleEditRecord = async (record) => {
     console.log('record', record);
-    console.log('positionName', position.name);
-    console.log('buttonProps', buttonProps);
+    setFlagEditForm('edit');
+    setShowModel(!showModal);
+    setCategoryRecord(record);
   };
 
   //handle submit form add category
   const handleSubmitFormCategory = async (values) => {
     setButtonLoading(true);
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        console.log(values);
-        resolve(true);
-      }, 2000);
-    });
+    if (values.edit) {
+      console.log('values edit', values);
+      const idCategory = categoryRecord.id;
+      const newValues = Object.assign({}, values);
+      const attr = 'edit';
+      const dataEdit = Object.keys(newValues).reduce((item, key) => {
+        if (key !== attr) {
+          item[key] = newValues[key];
+        }
+        return item;
+      }, {});
+      handleCancelModel();
+      await updateCategory(idCategory, dataEdit);
+    } else {
+      await addCategory(values);
+      handleResetForm();
+    }
+    actionRef?.current?.reload();
     setButtonLoading(false);
   };
 
-  const handleOk = () => {
-    console.log('ok');
-    // -> xác nhận delete category và gọi api để delete
-    // sau đó dùng action ref để gọi reload lại table
-  };
-  const handleCancel = () => {
-    console.log('cancel');
+  const handleDeleteCategory = async (record) => {
+    const result = await deleteCategory(record.id);
+    if (result) {
+      actionRef?.current?.reload();
+    }
   };
 
   return (
@@ -219,20 +218,41 @@ const Category = () => {
         <ProTable
           columns={column}
           // dataSource={}
-          request={(params, sort, filter) => {
-            // console.log('params', params);
-            // console.log('sort', sort);
-            // console.log('filter', filter);
-            if (params.name === 'aa') {
-              return {
-                data: [
-                  {
-                    number: 3,
-                    name: 'Áo',
-                  },
-                ],
-                success: true,
-              };
+          request={async (params, sort, filter) => {
+            const currentAttr = 'current';
+            const pageSizeAttr = 'pageSize';
+            console.log(params);
+            const data = [];
+            // do day la params search tren form nen phai loai bo current va pageSize
+            if (params.name) {
+              const newParams = Object.keys(params).reduce((item, key) => {
+                //code loai bo current va pagesize
+                if (key != currentAttr && key != pageSizeAttr) {
+                  if (key === 'name') {
+                    item.name = params[key];
+                  } else {
+                    item[key] = params[key];
+                  }
+                }
+                return item;
+              }, {});
+              console.log('params', newParams);
+
+              await getCategories(newParams).then((res) => {
+                res?.payload?.map((item, index) => {
+                  item.number = index + 1;
+                  data[index] = item;
+                });
+                setTotal(res?.total);
+              });
+            } else {
+              await getCategories(params).then((res) => {
+                res?.payload?.map((item, index) => {
+                  item.number = index + 1;
+                  data[index] = item;
+                });
+                setTotal(res?.total);
+              });
             }
             return {
               data: data,
@@ -242,7 +262,13 @@ const Category = () => {
           onReset={true}
           actionRef={actionRef}
           pagination={{
-            pageSize: 5,
+            current: page,
+            pageSize: pageSize,
+            total: total,
+            onchange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+            },
           }}
           rowKey="idCategory"
           search={{
@@ -264,74 +290,27 @@ const Category = () => {
           ]}
         />
       </PageContainer>
-      {/* <Modal
-                visible={showModal}
-                title="Add New Category"
-                centered={true}
-                onCancel={() => handleCancelModel()}
-                footer={[
-                    <Button 
-                        key='cancelModel'
-                        type='danger'
-                        onClick={() => handleCancelModel()}
-                    >
-                        Cancel
-                    </Button>
-                ]}
-            >
-                <ProForm
-                    onReset={true}
-                    formRef={formAddCategoryRef}
-                    submitter={{
-                        render: (props, doms) => {
-                   
-                            return [
-                                <>
-                                    <Button
-                                        key={`clearFieldFormCategory`}
-                                        type='default'
-                                        onClick={() => props.form?.resetFields()}
-                                    >   
-                                        Reset
-                                    </Button>
-                                    <Button
-                                        key='submitAddCategory'
-                                        type='primary'
-                                        onClick={() => props.form?.submit()}
-                                        loading={buttonLoading}
-                                    >
-                                        Submit
-                                    </Button>
-                                </>
-                               
-                            ]
-                        }
-                    }}
-                    onFinish={async (values) => await handleSubmitFormCategory(values)}
-                >
-                    <ProForm.Group>
-                        <ProFormText 
-                            label='Name'
-                            width='lg'
-                            placeholder='Enter category name'
-                            name='nameCategory'
-                            rules={[{ 
-                                required: true,
-                                message: 'Input category name before submit'
-                            }]}
-                        />
-                    </ProForm.Group>
-                </ProForm>
-            </Modal> */}
-      <ModalForm
-        showModal={showModal}
-        titleModal="Add New Category"
-        handleCancelModel={handleCancelModel}
-        formRef={formAddCategoryRef}
-        buttonSubmitter={buttonSubmitterCategory}
-        handleSubmitForm={handleSubmitFormCategory}
-        formField={formFieldAddCategory}
-      />
+      {flagEditForm === 'edit' ? (
+        <ModalForm
+          showModal={showModal}
+          titleModal={`Edit ${categoryRecord.name}`}
+          handleCancelModel={handleCancelModel}
+          formRef={formAddCategoryRef}
+          buttonSubmitter={buttonSubmitterCategory}
+          handleSubmitForm={handleSubmitFormCategory}
+          formField={formFieldEditCategory}
+        />
+      ) : (
+        <ModalForm
+          showModal={showModal}
+          titleModal="Add New Category"
+          handleCancelModel={handleCancelModel}
+          formRef={formAddCategoryRef}
+          buttonSubmitter={buttonSubmitterCategory}
+          handleSubmitForm={handleSubmitFormCategory}
+          formField={formFieldAddCategory}
+        />
+      )}
     </>
   );
 };

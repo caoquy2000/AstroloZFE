@@ -288,7 +288,6 @@ const House = () => {
   React.useEffect(() => {
     if (houseRecord) {
       formHouseRef?.current?.setFieldsValue(houseRecord);
-      setStateEditor(houseRecord.mainContent);
     }
   }, [houseRecord]);
 
@@ -366,6 +365,7 @@ const House = () => {
       }, {});
 
       console.log('dataEdit', dataEdit);
+      handleCancelModal();
       await updateHouse(houseRecord.id, dataEdit);
     } else {
       await addHouse(values);
@@ -379,11 +379,13 @@ const House = () => {
   //xuli mo form edit zodiac
   const handleEditHouseForm = (record) => {
     setFlagEditForm('edit');
-    record.description = record.decription;
-    delete record.decription;
+    const newObjRecord = { ...record };
+    newObjRecord.description = newObjRecord.decription;
+    delete newObjRecord.decription;
     setShowModal(!showModal);
     console.log('record', record);
-    setHouseRecord(record);
+    setHouseRecord(newObjRecord);
+    setStateEditor(record.mainContent);
   };
 
   //xuli delete house

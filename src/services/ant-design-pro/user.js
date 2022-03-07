@@ -7,9 +7,8 @@ export const getUsers = async (params) => {
     })
     .then((response) => {
       console.log('response getUsers', response);
-      if (response && response.length > 0) {
-        return response;
-      }
+
+      return response;
     })
     .catch((error) => {
       console.log('errorGetUsers', error);

@@ -3,10 +3,11 @@ import { uploadFile } from '@/utils/uploadFile';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
-import { Button, message } from 'antd';
+import { Button, message, Space, Tag } from 'antd';
 import React from 'react';
-import { addProductMaster } from '@/services/productmaster';
-import { getProductMasters } from '@/services/productmaster';
+import { addProductMaster, deleteProductMaster } from '@/services/productmaster';
+import { getProductMasters, updateProductMaster } from '@/services/productmaster';
+import { getCategories } from '@/services/category';
 const ProductMaster = () => {
   const column = [
     {
@@ -14,6 +15,7 @@ const ProductMaster = () => {
       dataIndex: 'number',
       sorter: (a, b) => a.number - b.number,
       search: false,
+      width: '10%',
     },
     {
       title: 'Name',
@@ -29,22 +31,27 @@ const ProductMaster = () => {
           },
         ],
       },
+      width: '20%',
     },
     {
       title: 'Description',
       dataIndex: 'description',
       copyable: true,
       valueType: 'description',
-      sorter: (a, b) => a.description.localeCompare(b.description),
       search: false,
+      width: '40%',
     },
     {
-      title: 'Detail',
-      dataIndex: 'detail',
-      copyable: true,
-      valueType: 'detail',
-      sorter: (a, b) => a.detail.localeCompare(b.detail),
-      search: false,
+      title: 'Status',
+      dataIndex: 'status',
+      valueType: 'status',
+      render: (_, record) => (
+        <Space>
+          {record.status == '1' && <Tag color="green">Active</Tag>}
+          {record.status == '0' && <Tag color="red">Unactive</Tag>}
+        </Space>
+      ),
+      width: '10%',
     },
     {
       title: 'Action',
@@ -72,6 +79,7 @@ const ProductMaster = () => {
                 size="middle"
                 icon={<EditOutlined />}
                 block="true"
+                onClick={() => handleEditProductMasterForm(record)}
               >
                 Edit
               </Button>
@@ -95,6 +103,7 @@ const ProductMaster = () => {
           </div>
         );
       },
+      width: '50%',
     },
   ];
 
@@ -155,12 +164,7 @@ const ProductMaster = () => {
       requiredField: 'true',
       ruleMessage: 'Please select category',
       //lấy category và update lại formselect sau
-      valueEnum: [
-        {
-          valueName: 2,
-          valueDisplay: 'Áo thun',
-        },
-      ],
+      valueEnum: [],
     },
     {
       fieldType: 'uploadListImg',
@@ -168,11 +172,84 @@ const ProductMaster = () => {
     },
   ];
 
-  const formFieldEdit = [];
+  const formFieldEdit = [
+    {
+      fieldType: 'formText',
+      key: 'fieldAddName',
+      label: 'Name',
+      width: 'lg',
+      placeholder: 'Enter product name',
+      name: 'name',
+      requiredField: 'true',
+      ruleMessage: 'Input name before submit',
+    },
+    {
+      fieldType: 'formTextArea',
+      key: 'fieldAddDescription',
+      label: 'Description',
+      width: 'lg',
+      placeholder: 'Enter product description',
+      name: 'description',
+      requiredField: 'true',
+      ruleMessage: 'Input description before submit',
+    },
+    {
+      fieldType: 'formTextArea',
+      key: 'fieldAddDetail',
+      label: 'Detail',
+      width: 'lg',
+      placeholder: 'Enter product detail',
+      name: 'detail',
+      requiredField: 'true',
+      ruleMessage: 'Input detail before submit',
+    },
+    {
+      fieldType: 'formSelect',
+      key: 'selectStatusProduct',
+      name: 'status',
+      label: 'Status',
+      defaultValue: 1,
+      valueEnum: [
+        {
+          valueName: 1,
+          valueDisplay: 'Active',
+        },
+        {
+          valueName: 0,
+          valueDisplay: 'Unactive',
+        },
+      ],
+      placeholder: 'Please select status',
+      requiredField: 'true',
+      ruleMessage: 'Please select product status',
+    },
+    {
+      fieldType: 'formSelect',
+      key: 'selectCategoryId',
+      name: 'categoryId',
+      label: 'Category',
+      placeholder: 'Select Category',
+      requiredField: 'true',
+      ruleMessage: 'Please select category',
+      //lấy category và update lại formselect sau
+      valueEnum: [],
+    },
+    {
+      fieldType: 'uploadListImg',
+      nameUpload: 'uploadListImg',
+    },
+    {
+      fieldType: 'checkEdit',
+      name: 'edit',
+      value: 'edit',
+    },
+  ];
   //ref
   const tableProductMasterRef = React.useRef();
   const formProductMasterRef = React.useRef();
 
+  //state cua list category;
+  const [categoryList, setCategoryList] = React.useState([]);
   //state cua upload img len firebase
   const [listImgLinkFirebase, setListImgLinkFirebase] = React.useState([]);
   const [loadingUploadImgFirebase, setLoadingUploadingImgFirebase] = React.useState(false);
@@ -187,6 +264,10 @@ const ProductMaster = () => {
   const [formFieldAddProductMaster, setFormFieldAddProductMaster] = React.useState(formFieldAdd);
   const [formFieldEditProductMaster, setFormFieldEditProductMaster] = React.useState(formFieldEdit);
 
+  //paging
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(8);
+  const [total, setTotal] = React.useState(10);
   //xuli loading upload img firebase
   React.useEffect(() => {
     if (loadingUploadImgFirebase) {
@@ -199,6 +280,60 @@ const ProductMaster = () => {
     };
   }, [loadingUploadImgFirebase]);
 
+  React.useEffect(() => {
+    (async () => {
+      const result = await getCategories();
+      if (result?.payload?.length > 0) {
+        setCategoryList(result?.payload);
+        const valueEnum = [];
+        result?.payload?.map((item) => {
+          const el = {
+            valueName: item.id,
+            valueDisplay: item.name,
+          };
+          valueEnum.push(el);
+        });
+        const newFieldAdd = [];
+        formFieldAdd?.map((item, i) => {
+          if (item?.fieldType === 'formSelect' && item?.key === 'selectCategoryId') {
+            item.valueEnum = [...valueEnum];
+            newFieldAdd.push(item);
+          } else {
+            newFieldAdd.push(item);
+          }
+        });
+        setFormFieldAddProductMaster(newFieldAdd);
+        const newFieldEdit = [];
+        formFieldEdit?.map((item) => {
+          if (item?.fieldType === 'formSelect' && item?.key === 'selectCategoryId') {
+            item.valueEnum = [...valueEnum];
+            newFieldEdit.push(item);
+          } else {
+            newFieldEdit.push(item);
+          }
+        });
+        setFormFieldEditProductMaster(newFieldEdit);
+      }
+    })();
+  }, []);
+
+  //xuli pass productmaster record
+  React.useEffect(() => {
+    if (productMasterRecord) {
+      formProductMasterRef?.current?.setFieldsValue(productMasterRecord);
+    }
+  }, [productMasterRecord]);
+
+  //xuli loading button submit form add or edit planet
+  React.useEffect(() => {
+    const newButtonSubmitterPM = buttonSubmitterProductMaster.map((item) => {
+      if (item.name === 'Submit') {
+        item.loading = buttonLoading;
+      }
+      return item;
+    });
+    setButtonSubmitterProductMaster(newButtonSubmitterPM);
+  }, [buttonLoading]);
   //customupload img
   const customUpload = async ({ onError, onSuccess, file }) => {
     const isImage = file.type.indexOf('image/') === 0;
@@ -220,9 +355,11 @@ const ProductMaster = () => {
 
       if (imgLink) {
         const newListImg = [...listImgLinkFirebase];
-        file.thumbUrl = imgLink;
-        newListImg.push(file);
+        console.log('newListImg', newListImg);
+
+        newListImg.push(imgLink);
         setListImgLinkFirebase(newListImg);
+
         setLoadingUploadingImgFirebase(false);
         message.success('Upload Image Success!');
       }
@@ -259,18 +396,47 @@ const ProductMaster = () => {
     setListImgLinkFirebase([]);
   };
 
+  //xuli change list img
+  const handleChangeListImgFirebase = (list) => {
+    console.log('listImgFirebase', list);
+    const newList = listImgLinkFirebase.filter((item) => {
+      return item != list.file.thumbUrl;
+    });
+    setListImgLinkFirebase(newList);
+  };
+
   //xuli submit form
   const handleSubmitFormProductMaster = async (values) => {
     setButtonLoading(true);
     if (values.edit) {
+      const idPM = productMasterRecord.id;
+      values.masterProductId = idPM;
+      const newListImgEdit = [];
+      listImgLinkFirebase.map((item) => {
+        newListImgEdit.push(item);
+      });
+      values.imgLinksAdd = newListImgEdit;
+
+      const newValues = Object.assign({}, values);
+      const attr = 'edit';
+      const dataEdit = Object.keys(newValues).reduce((item, key) => {
+        if (key !== attr) {
+          item[key] = newValues[key];
+        }
+        return item;
+      }, {});
+      handleCancelModal();
+      console.log('dataEdit', dataEdit);
+      await updateProductMaster(idPM, dataEdit);
     } else {
       const newListImgAdd = [];
       listImgLinkFirebase.map((item) => {
-        newListImgAdd.push(item.thumbUrl);
+        newListImgAdd.push(item);
       });
       values.imgLink = newListImgAdd;
 
       await addProductMaster(values);
+      handleResetForm();
     }
     tableProductMasterRef?.current?.reload();
     setButtonLoading(false);
@@ -281,9 +447,16 @@ const ProductMaster = () => {
     setFlagEditForm('edit');
     setShowModal(!showModal);
     setProductMasterRecord(record);
+    setListImgLinkFirebase(record.imgLinks);
+    console.log('productmaster', record);
   };
 
-  const handleDeleteProduct = (record) => {};
+  const handleDeleteProduct = async (record) => {
+    const result = await deleteProductMaster(record.id);
+    if (result) {
+      tableProductMasterRef?.current?.reload();
+    }
+  };
 
   return (
     <>
@@ -292,7 +465,13 @@ const ProductMaster = () => {
           columns={column}
           actionRef={tableProductMasterRef}
           pagination={{
-            pageSize: 8,
+            current: page,
+            pageSize: pageSize,
+            total: total,
+            onchange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+            },
           }}
           search={{
             labelWidth: 'auto',
@@ -328,10 +507,11 @@ const ProductMaster = () => {
             const data = [];
             await getProductMasters(newParams).then((res) => {
               console.log('res at table query', res);
-              res?.map((item, index) => {
+              res?.payload?.map((item, index) => {
                 item.number = index + 1;
                 data[index] = item;
               });
+              setTotal(res?.total);
             });
             return {
               data: data,
@@ -340,18 +520,34 @@ const ProductMaster = () => {
           }}
         />
       </PageContainer>
-      <ModalForm
-        showModal={showModal}
-        titleModal="Add New Product Master"
-        handleCancelModel={handleCancelModal}
-        formRef={formProductMasterRef}
-        buttonSubmitter={buttonSubmitterProductMaster}
-        handleSubmitForm={handleSubmitFormProductMaster}
-        formField={formFieldAddProductMaster}
-        customUpload={customUpload}
-        listImgLinkFirebase={listImgLinkFirebase}
-        handleResetForm={handleResetForm}
-      />
+      {flagEditForm === 'edit' ? (
+        <ModalForm
+          showModal={showModal}
+          titleModal={`Edit ${productMasterRecord.name}`}
+          handleCancelModel={handleCancelModal}
+          formRef={formProductMasterRef}
+          buttonSubmitter={buttonSubmitterProductMaster}
+          handleSubmitForm={handleSubmitFormProductMaster}
+          formField={formFieldEditProductMaster}
+          customUpload={customUpload}
+          listImgLinkFirebase={listImgLinkFirebase}
+          handleResetForm={handleResetForm}
+          handleChangeListImgFirebase={handleChangeListImgFirebase}
+        />
+      ) : (
+        <ModalForm
+          showModal={showModal}
+          titleModal="Add New Product Master"
+          handleCancelModel={handleCancelModal}
+          formRef={formProductMasterRef}
+          buttonSubmitter={buttonSubmitterProductMaster}
+          handleSubmitForm={handleSubmitFormProductMaster}
+          formField={formFieldAddProductMaster}
+          customUpload={customUpload}
+          listImgLinkFirebase={listImgLinkFirebase}
+          handleResetForm={handleResetForm}
+        />
+      )}
     </>
   );
 };

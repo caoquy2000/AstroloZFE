@@ -210,6 +210,10 @@ const User = () => {
   const [formFieldEditUser, setFormFieldEditUser] = React.useState(formFieldEdit);
   const { initialState, setInitialState } = useModel('@@initialState');
 
+  //paging
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(8);
+  const [total, setTotal] = React.useState(10);
   React.useEffect(() => {
     const newButtonSubmitUser = buttonSubmitterUser.map((item) => {
       if (item.name === 'Submit') {
@@ -318,19 +322,21 @@ const User = () => {
               console.log('params', newParams);
               await getUsers(newParams).then((res) => {
                 console.log('res at table query', res);
-                res?.map((item, index) => {
+                res?.payload?.map((item, index) => {
                   item.number = index + 1;
                   data[index] = item;
                 });
+                setTotal(res?.total);
               });
             } else {
               console.log('B');
               await getUsers(params).then((res) => {
                 console.log('res at table query', res);
-                res?.map((item, index) => {
+                res?.payload?.map((item, index) => {
                   item.number = index + 1;
                   data[index] = item;
                 });
+                setTotal(res?.total);
               });
             }
 
@@ -342,7 +348,13 @@ const User = () => {
           onReset={true}
           actionRef={actionRef}
           pagination={{
-            pageSize: 8,
+            current: page,
+            pageSize: pageSize,
+            total: total,
+            onchange: (page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+            },
           }}
           search={{
             labelWidth: 'auto',

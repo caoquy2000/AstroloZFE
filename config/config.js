@@ -125,6 +125,24 @@ export default defineConfig({
           component: './shop/productvariant',
         },
         {
+          path: '/shop/order',
+          name: 'Order',
+          access: 'canAdmin',
+          component: './shop/order',
+        },
+        {
+          path: '/shop/orderdetail',
+          name: 'OrderDetail',
+          access: 'canAdmin',
+          component: './shop/orderdetail',
+        },
+        {
+          path: '/shop/profile',
+          name: 'Profile',
+          access: 'canAdmin',
+          component: './shop/profile',
+        },
+        {
           component: './404',
         },
       ],

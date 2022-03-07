@@ -24,8 +24,8 @@ export const deleteZodiac = (zodiacId) => {
   return request.delete(`/api/v1/zodiac/${zodiacId}`);
 };
 
-export const updateZodiac = (zodiacId, body) => {
-  return request.put('/api/v1/zodiac', {
+export const updateZodiac = async (zodiacId, body) => {
+  return await request.put('/api/v1/zodiac', {
     params: {
       id: zodiacId,
     },

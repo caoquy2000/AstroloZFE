@@ -183,7 +183,7 @@ const Zodiac = () => {
       name: 'zodiacIcon',
       nameUpload: 'iconZodiac',
       nameInputFile: 'zodiacFileToFirebase',
-      readOnly: 'true',
+      readOnly: true,
       requiredField: 'true',
       ruleMessage: 'Upload image before submit',
     },
@@ -256,8 +256,8 @@ const Zodiac = () => {
       name: 'icon',
       nameUpload: 'iconZodiac',
       nameInputFile: 'zodiacFileToFirebase',
-      readOnly: 'true',
-      requiredField: 'true',
+      readOnly: true,
+      requiredField: true,
       ruleMessage: 'Upload image before submit',
     },
     {
@@ -272,7 +272,7 @@ const Zodiac = () => {
     },
     {
       fieldType: 'EditorMainContent',
-      nameTextArea: 'mainContent',
+      nameTextArea: 'zodiacMainContent',
     },
     {
       fieldType: 'checkEdit',
@@ -325,7 +325,6 @@ const Zodiac = () => {
   React.useEffect(() => {
     if (zodiacRecord) {
       formZodiacRef?.current?.setFieldsValue(zodiacRecord);
-      setStateEditor(zodiacRecord.mainContent);
     }
   }, [zodiacRecord]);
 
@@ -349,9 +348,15 @@ const Zodiac = () => {
 
       if (imgLink) {
         setImgLinkFirebase(imgLink);
-        formZodiacRef?.current?.setFieldsValue({
-          ['zodiacIcon']: imgLink,
-        });
+        if (flagEditForm) {
+          formZodiacRef?.current?.setFieldsValue({
+            ['icon']: imgLink,
+          });
+        } else {
+          formZodiacRef?.current?.setFieldsValue({
+            ['zodiacIcon']: imgLink,
+          });
+        }
         setLoadingUploadingImgFirebase(false);
         message.success('Upload Image Success!');
       }
@@ -393,6 +398,7 @@ const Zodiac = () => {
     setButtonLoading(true);
     if (values.edit) {
       console.log('valuesFormBeforeFix', values);
+      const idZodiac = zodiacRecord.id;
       const newValues = Object.assign({}, values);
       const attr = 'edit';
       const dataEdit = Object.keys(newValues).reduce((item, key) => {
@@ -407,11 +413,12 @@ const Zodiac = () => {
       delete dataEdit.name;
       dataEdit.zodiacIcon = dataEdit.icon;
       delete dataEdit.icon;
-      dataEdit.zodiacMainContent = dataEdit.mainContent;
-      delete dataEdit.mainContent;
       console.log('dataEdit', dataEdit);
-      await updateZodiac(zodiacRecord.id, dataEdit);
+      console.log('zodiacRecordEdit', zodiacRecord);
+      handleCancelModal();
+      await updateZodiac(idZodiac, dataEdit);
     } else {
+      console.log(values);
       await addZodiac(values);
       handleResetForm();
       setStateEditor(null);
@@ -424,7 +431,12 @@ const Zodiac = () => {
   const handleEditZodiacForm = (record) => {
     setFlagEditForm('edit');
     setShowModal(!showModal);
-    setZodiacRecord(record);
+    const newObjRecord = { ...record };
+    newObjRecord.zodiacMainContent = newObjRecord.mainContent;
+    delete newObjRecord.mainContent;
+    console.log('record zodiac', newObjRecord);
+    setZodiacRecord(newObjRecord);
+    setStateEditor(newObjRecord.zodiacMainContent);
   };
 
   //xuli delete zodiac
@@ -440,6 +452,7 @@ const Zodiac = () => {
     if (state) {
       // setStateEditor(state);
       console.log('stateEditor', state);
+
       formZodiacRef?.current?.setFieldsValue({
         ['zodiacMainContent']: state,
       });
@@ -452,13 +465,8 @@ const Zodiac = () => {
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
     input.click();
-    console.log('A');
     input.onchange = async () => {
-      console.log('b');
-
       try {
-        console.log('c');
-
         let file = input.files[0];
         const imgLinkEditor = await uploadFile(file, 'editor');
         if (imgLinkEditor) {

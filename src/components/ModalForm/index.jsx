@@ -33,6 +33,7 @@ const ModalForm = (props) => {
     editorRef,
     handleUploadImgInEditor,
     handleResetForm,
+    handleChangeListImgFirebase,
   } = props;
   //quill editor get css style inline
   const Quill = ReactQuill.Quill;
@@ -85,11 +86,16 @@ const ModalForm = (props) => {
 
   React.useEffect(() => {
     // set lai list img
+
     if (listImgLinkFirebase) {
       if (listImgLinkFirebase.length > 0) {
         const newFileList = [];
         listImgLinkFirebase.map((item, index) => {
-          newFileList.push(item);
+          const el = {};
+          el.uid = Math.random();
+          el.status = 'done';
+          el.thumbUrl = item;
+          newFileList.push(el);
         });
         setFileList(newFileList);
       }
@@ -144,6 +150,12 @@ const ModalForm = (props) => {
     handleUploadImgInEditor();
   };
 
+  const onChangeListImg = (list) => {
+    if (handleChangeListImgFirebase) {
+      handleChangeListImgFirebase(list);
+    }
+  };
+
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -196,6 +208,23 @@ const ModalForm = (props) => {
             {formField?.map((item) => (
               <>
                 {item?.fieldType === 'formText' && (
+                  <ProForm.Group>
+                    <ProFormText
+                      key={item?.key}
+                      label={item?.label}
+                      width={item?.width}
+                      placeholder={item?.placeholder}
+                      name={item?.name}
+                      rules={[
+                        {
+                          required: item?.requiredField,
+                          message: item?.ruleMessage,
+                        },
+                      ]}
+                    />
+                  </ProForm.Group>
+                )}
+                {item?.fieldType === 'formDigit' && (
                   <ProForm.Group>
                     <ProFormText
                       key={item?.key}
@@ -284,6 +313,7 @@ const ModalForm = (props) => {
                       customRequest={customUploadChild}
                       listType="picture-card"
                       fileList={fileList}
+                      onChange={onChangeListImg}
                     >
                       {fileList.length >= 3 ? null : uploadButton}
                     </Upload>

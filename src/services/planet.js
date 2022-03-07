@@ -1,7 +1,7 @@
 import request from '@/utils/requestServer';
 
-export const addPlanet = (body) => {
-  return request.post('/api/v1/planet', { data: body });
+export const addPlanet = async (body) => {
+  return await request.post('/api/v1/planet', { data: body });
 };
 
 export const getPlanets = async (params) => {

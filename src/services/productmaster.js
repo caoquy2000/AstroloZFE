@@ -11,15 +11,41 @@ export const getProductMasters = async (params) => {
     })
     .then((response) => {
       console.log('response getProductMasters', response);
-      if (response && response.length > 0) {
-        return response;
-      }
+
+      return response;
     })
     .catch((error) => {
       console.log('errorGetProductMasters', error);
     });
 };
 
-export const deleteProduct = (productId) => {
-  request.delete(`/api/v1/product/${productId}`);
+export const deleteProductMaster = (productId) => {
+  request.delete('/api/v1/product', {
+    params: {
+      id: productId,
+    },
+  });
+};
+export const updateProductMaster = (productId, body) => {
+  return request.put('/api/v1/product/master', {
+    params: {
+      id: productId,
+    },
+    data: body,
+  });
+};
+
+export const getProductMaster = async (productId) => {
+  return await request
+    .get('/api/v1/product/master', {
+      params: {
+        id: productId,
+      },
+    })
+    .then((res) => {
+      return res;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };

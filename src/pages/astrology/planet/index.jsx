@@ -37,7 +37,7 @@ const Planet = () => {
     {
       title: 'Planet Description',
       dataIndex: 'decription',
-      copyable: true,
+      copyable: false,
       search: false,
       width: '25%',
     },
@@ -296,7 +296,6 @@ const Planet = () => {
   React.useEffect(() => {
     if (planetRecord) {
       formPlanetRef?.current?.setFieldsValue(planetRecord);
-      setStateEditor(planetRecord.mainContent);
     }
   }, [planetRecord]);
 
@@ -348,8 +347,9 @@ const Planet = () => {
     setPlanetRecord(null);
     setImgLinkFirebase(null);
     setStateEditor(null);
-    if (formPlanetRef) {
+    if (formPlanetRef || tablePlanetRef) {
       formPlanetRef?.current?.resetFields();
+      tablePlanetRef?.current?.reload();
     }
   };
 
@@ -374,6 +374,7 @@ const Planet = () => {
       }, {});
 
       console.log('dataEdit', dataEdit);
+      handleCancelModal();
       await updatePlanet(planetRecord.id, dataEdit);
     } else {
       await addPlanet(values);
@@ -387,11 +388,13 @@ const Planet = () => {
   //xuli mo form edit zodiac
   const handleEditPlanetForm = (record) => {
     setFlagEditForm('edit');
-    record.description = record.decription;
-    delete record.decription;
+    const newObjRecord = { ...record };
+    newObjRecord.description = newObjRecord.decription;
+    delete newObjRecord.decription;
     setShowModal(!showModal);
-    console.log('record', record);
-    setPlanetRecord(record);
+    console.log('record', newObjRecord);
+    setPlanetRecord(newObjRecord);
+    setStateEditor(record.mainContent);
   };
 
   //xuli delete planet
@@ -445,7 +448,7 @@ const Planet = () => {
           columns={column}
           actionRef={tablePlanetRef}
           pagination={{
-            pageSize: 8,
+            pageSize: 4,
           }}
           search={{
             labelWidth: 'auto',
@@ -491,7 +494,7 @@ const Planet = () => {
                 });
               });
             } else {
-              params.pageSize = 12;
+              params.pageSize = 20;
               await getPlanets(params).then((res) => {
                 res?.map((item, index) => {
                   item.number = index + 1;
